@@ -10,9 +10,24 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        .section {
-            transition: opacity 0.5s ease-in-out;
+        .main-content-section {
+            transition: opacity 0.3s ease-in-out;
         }
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937; /* gray-800 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563; /* gray-600 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; /* gray-500 */
+        }
+
         /* Print-specific styles */
         @media print {
             body, #preview-section, #printable-area {
@@ -31,7 +46,6 @@
             .print-details-box {
                 background-color: #f9fafb !important; /* A light gray */
             }
-
             body {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
@@ -39,8 +53,12 @@
             .no-print {
                 display: none !important;
             }
-            #list-section, #form-section, #button-container {
+            #sidebar-section, #button-container {
                 display: none !important;
+            }
+            main {
+                padding: 0 !important;
+                overflow: visible !important;
             }
             #preview-section {
                 display: block !important;
@@ -64,341 +82,356 @@
         }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-300 flex items-center justify-center min-h-screen p-4">
+<body class="bg-gray-900 text-gray-300 antialiased">
 
-    <div class="container mx-auto max-w-4xl">
-
-        <!-- Beneficiary List Section -->
-        <div id="list-section" class="bg-gray-800 p-8 rounded-xl shadow-lg section">
-             <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
-                <h1 class="text-3xl font-bold text-white">Saved Beneficiaries</h1>
-                <button id="add-new-beneficiary-btn" class="bg-blue-600 text-white font-bold py-2 px-5 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 transform hover:scale-105">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-full max-w-sm bg-gray-800 flex flex-col border-r border-gray-700 no-print">
+            <div class="p-6 border-b border-gray-700 flex justify-between items-center">
+                 <h1 class="text-2xl font-bold text-white">Beneficiaries</h1>
+                 <button id="add-new-beneficiary-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all text-sm">
                     + Add New
                 </button>
             </div>
-            <div id="beneficiary-list" class="space-y-3">
+            <div id="beneficiary-list" class="overflow-y-auto flex-1 p-4 space-y-2">
                 <!-- Beneficiaries will be listed here -->
-                <p id="no-beneficiaries-msg" class="text-center text-gray-400 py-8">No beneficiaries saved yet. Click 'Add New' to get started.</p>
+                <p id="no-beneficiaries-msg" class="text-center text-gray-400 py-8 px-4">No beneficiaries saved yet. Click 'Add New' to get started.</p>
             </div>
-        </div>
+        </aside>
 
-        <!-- Form Section -->
-        <div id="form-section" class="bg-gray-800 p-8 rounded-xl shadow-lg section hidden">
-            <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-white">Beneficiary Details</h1>
-                <p class="text-gray-400 mt-2">Fill in the details below.</p>
+        <!-- Main Content -->
+        <main class="flex-1 p-8 overflow-y-auto">
+            
+            <!-- Welcome Section -->
+            <div id="welcome-section" class="main-content-section h-full flex flex-col items-center justify-center text-center">
+                <svg class="w-24 h-24 text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <h2 class="text-2xl font-bold text-white">Beneficiary Document Creator</h2>
+                <p class="text-gray-400 mt-2 max-w-md">Select a beneficiary from the list to view their details, or click "Add New" to create a new entry.</p>
             </div>
 
-            <form id="beneficiary-form" class="space-y-6">
-                <input type="hidden" id="edit-id" name="edit-id">
-                <!-- Personal Details -->
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-2 mb-4">Personal Information</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="name" class="block text-sm font-medium text-gray-400 mb-1">Full Name</label>
-                            <input type="text" id="name" name="name" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        </div>
-                        <div>
-                            <label for="proof-type" class="block text-sm font-medium text-gray-400 mb-1">Proof of Identity</label>
-                            <select id="proof-type" name="proof-type" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                                <option>Aadhaar Card</option>
-                                <option>PAN Card</option>
-                                <option>Voter ID Card</option>
-                                <option>Passport</option>
-                                <option>Driving License</option>
-                            </select>
+            <!-- Form Section -->
+            <div id="form-section" class="main-content-section hidden bg-gray-800 p-8 rounded-xl shadow-lg">
+                 <h1 class="text-3xl font-bold text-white mb-6">Beneficiary Details</h1>
+                <form id="beneficiary-form" class="space-y-6">
+                    <input type="hidden" id="edit-id" name="edit-id">
+                    <!-- Personal Details -->
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-2 mb-4">Personal Information</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-gray-400 mb-1">Full Name</label>
+                                <input type="text" id="name" name="name" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            </div>
+                            <div>
+                                <label for="proof-type" class="block text-sm font-medium text-gray-400 mb-1">Proof of Identity</label>
+                                <select id="proof-type" name="proof-type" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                    <option>Aadhaar Card</option>
+                                    <option>PAN Card</option>
+                                    <option>Voter ID Card</option>
+                                    <option>Passport</option>
+                                    <option>Driving License</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Bank Details -->
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-2 mb-4">Bank Details</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="bank-name" class="block text-sm font-medium text-gray-400 mb-1">Bank Name</label>
-                            <input list="indian-banks" type="text" id="bank-name" name="bank-name" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                            <datalist id="indian-banks">
-                                <option value="State Bank of India"></option>
-                                <option value="HDFC Bank"></option>
-                                <option value="ICICI Bank"></option>
-                                <option value="Punjab National Bank"></option>
-                                <option value="Bank of Baroda"></option>
-                                <option value="Canara Bank"></option>
-                                <option value="Union Bank of India"></option>
-                                <option value="Axis Bank"></option>
-                                <option value="Kotak Mahindra Bank"></option>
-                                <option value="IndusInd Bank"></option>
-                                <option value="Bank of India"></option>
-                                <option value="Central Bank of India"></option>
-                                <option value="Indian Bank"></option>
-                                <option value="Yes Bank"></option>
-                                <option value="IDBI Bank"></option>
-                            </datalist>
-                        </div>
-                        <div>
-                            <label for="branch-code" class="block text-sm font-medium text-gray-400 mb-1">Bank Branch Code (IFSC)</label>
-                            <input type="text" id="branch-code" name="branch-code" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        </div>
-                        <div>
-                            <label for="account-no" class="block text-sm font-medium text-gray-400 mb-1">Account Number</label>
-                            <input type="text" id="account-no" name="account-no" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        </div>
-                        <div>
-                            <label for="account-type" class="block text-sm font-medium text-gray-400 mb-1">Account Type</label>
-                            <select id="account-type" name="account-type" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                                <option>Savings</option>
-                                <option>Current</option>
-                            </select>
+                    <!-- Bank Details -->
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-2 mb-4">Bank Details</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="bank-name" class="block text-sm font-medium text-gray-400 mb-1">Bank Name</label>
+                                <input list="indian-banks" type="text" id="bank-name" name="bank-name" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                <datalist id="indian-banks">
+                                    <option value="State Bank of India"></option><option value="HDFC Bank"></option><option value="ICICI Bank"></option><option value="Punjab National Bank"></option><option value="Bank of Baroda"></option><option value="Canara Bank"></option><option value="Union Bank of India"></option><option value="Axis Bank"></option><option value="Kotak Mahindra Bank"></option><option value="IndusInd Bank"></option><option value="Bank of India"></option><option value="Central Bank of India"></option><option value="Indian Bank"></option><option value="Yes Bank"></option><option value="IDBI Bank"></option>
+                                </datalist>
+                            </div>
+                            <div>
+                                <label for="branch-code" class="block text-sm font-medium text-gray-400 mb-1">Bank Branch Code (IFSC)</label>
+                                <input type="text" id="branch-code" name="branch-code" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            </div>
+                            <div>
+                                <label for="account-no" class="block text-sm font-medium text-gray-400 mb-1">Account Number</label>
+                                <input type="text" id="account-no" name="account-no" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            </div>
+                            <div>
+                                <label for="account-type" class="block text-sm font-medium text-gray-400 mb-1">Account Type</label>
+                                <select id="account-type" name="account-type" required class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                    <option>Savings</option>
+                                    <option>Current</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- File Upload -->
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-2 mb-4">Upload Identity Proof Images</h2>
-                    <label for="proof-images" class="block text-sm font-medium text-gray-400 mb-1">Upload one or two images (Front & Back)</label>
-                    <input type="file" id="proof-images" name="proof-images" accept="image/*" multiple class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 transition cursor-pointer">
-                    <p class="text-gray-500 text-xs mt-1">Leave blank if you don't want to change existing images while editing.</p>
-                    <p id="file-error" class="text-red-500 text-sm mt-1 hidden">Please select one or two files.</p>
-                </div>
-                
-                <!-- Buttons -->
-                <div class="text-center pt-4 flex gap-4 justify-center">
-                    <button type="button" id="cancel-form-btn" class="w-full md:w-auto bg-gray-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all">Cancel</button>
-                    <button type="submit" id="form-submit-btn" class="w-full md:w-auto bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all">Save Document</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Preview Section -->
-        <div id="preview-section" class="hidden bg-gray-800 p-8 rounded-xl shadow-lg section print-bg-white">
-            <div id="printable-area">
-                <h1 class="text-3xl font-bold text-center text-white mb-8 border-b-2 border-gray-700 pb-4 print-text-black">Beneficiary Details</h1>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 text-lg">
-                    <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Name:</strong> <span id="preview-name" class="text-white print-text-black"></span></div>
-                    <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Proof of ID:</strong> <span id="preview-proof-type" class="text-white print-text-black"></span></div>
-                    <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Bank Name:</strong> <span id="preview-bank-name" class="text-white print-text-black"></span></div>
-                    <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Branch Code:</strong> <span id="preview-branch-code" class="text-white print-text-black"></span></div>
-                    <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Account No:</strong> <span id="preview-account-no" class="text-white print-text-black"></span></div>
-                    <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Account Type:</strong> <span id="preview-account-type" class="text-white print-text-black"></span></div>
-                </div>
-
-                <h2 class="text-2xl font-semibold text-gray-200 mt-10 border-b border-gray-700 pb-2 mb-6 print-text-black">Proof of Identity Images</h2>
-                <div id="preview-images" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6 place-items-center">
-                    <!-- Images will be inserted here -->
-                </div>
+                    <!-- File Upload -->
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-2 mb-4">Upload Identity Proof Images</h2>
+                        <label for="proof-images" class="block text-sm font-medium text-gray-400 mb-1">Upload one or two images (Front & Back)</label>
+                        <input type="file" id="proof-images" name="proof-images" accept="image/*" multiple class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 transition cursor-pointer">
+                        <p class="text-gray-500 text-xs mt-1">Leave blank if you don't want to change existing images while editing.</p>
+                        <p id="file-error" class="text-red-500 text-sm mt-1 hidden">Please select one or two files.</p>
+                    </div>
+                    
+                    <!-- Buttons -->
+                    <div class="text-center pt-4 flex gap-4 justify-end">
+                        <button type="button" id="cancel-form-btn" class="w-full md:w-auto bg-gray-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all">Cancel</button>
+                        <button type="submit" id="form-submit-btn" class="w-full md:w-auto bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all">Save Document</button>
+                    </div>
+                </form>
             </div>
 
-            <div id="button-container" class="mt-10 text-center space-x-4 no-print">
-                <button id="print-button" class="bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition-all">Print</button>
-                <button id="back-to-list-btn" class="bg-gray-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all">Back to List</button>
+            <!-- Preview Section -->
+            <div id="preview-section" class="main-content-section hidden bg-gray-800 p-8 rounded-xl shadow-lg print-bg-white">
+                <div id="printable-area">
+                     <div class="flex justify-between items-start mb-8 border-b-2 border-gray-700 pb-4">
+                        <h1 class="text-3xl font-bold text-white print-text-black">Beneficiary Details</h1>
+                        <div id="button-container" class="text-center space-x-2 no-print">
+                            <button id="print-button" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition-all text-sm">Print</button>
+                            <button id="edit-preview-btn" class="bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600 transition-all text-sm">Edit</button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 text-lg">
+                        <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Name:</strong> <span id="preview-name" class="text-white print-text-black"></span></div>
+                        <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Proof of ID:</strong> <span id="preview-proof-type" class="text-white print-text-black"></span></div>
+                        <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Bank Name:</strong> <span id="preview-bank-name" class="text-white print-text-black"></span></div>
+                        <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Branch Code:</strong> <span id="preview-branch-code" class="text-white print-text-black"></span></div>
+                        <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Account No:</strong> <span id="preview-account-no" class="text-white print-text-black"></span></div>
+                        <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Account Type:</strong> <span id="preview-account-type" class="text-white print-text-black"></span></div>
+                    </div>
+
+                    <h2 class="text-2xl font-semibold text-gray-200 mt-10 border-b border-gray-700 pb-2 mb-6 print-text-black">Proof of Identity Images</h2>
+                    <div id="preview-images" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6 place-items-center">
+                    </div>
+                </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const listSection = document.getElementById('list-section');
-            const formSection = document.getElementById('form-section');
-            const previewSection = document.getElementById('preview-section');
-            
-            const beneficiaryForm = document.getElementById('beneficiary-form');
-            const imageInput = document.getElementById('proof-images');
-            const fileError = document.getElementById('file-error');
-            const storageKey = 'beneficiariesData'; // Changed key to reflect multiple entries
+    document.addEventListener('DOMContentLoaded', () => {
+        const welcomeSection = document.getElementById('welcome-section');
+        const formSection = document.getElementById('form-section');
+        const previewSection = document.getElementById('preview-section');
+        
+        const beneficiaryForm = document.getElementById('beneficiary-form');
+        const imageInput = document.getElementById('proof-images');
+        const fileError = document.getElementById('file-error');
+        const beneficiaryListContainer = document.getElementById('beneficiary-list');
+        const noDataMsg = document.getElementById('no-beneficiaries-msg');
+        
+        const storageKey = 'beneficiariesData';
 
-            // --- NAVIGATION AND VIEW MANAGEMENT ---
-            function showSection(sectionToShow) {
-                [listSection, formSection, previewSection].forEach(section => {
-                    if (section === sectionToShow) {
-                        section.classList.remove('hidden');
-                        setTimeout(() => section.classList.remove('opacity-0'), 10);
-                    } else {
-                        section.classList.add('opacity-0');
-                        setTimeout(() => section.classList.add('hidden'), 500);
-                    }
-                });
-                window.scrollTo(0, 0);
-            }
+        let activeBeneficiaryId = null;
 
-            // --- DATA HANDLING ---
-            const getBeneficiaries = () => JSON.parse(localStorage.getItem(storageKey)) || [];
-            const saveBeneficiaries = (data) => localStorage.setItem(storageKey, JSON.stringify(data));
-
-            // --- RENDERING FUNCTIONS ---
-            function renderBeneficiaryList() {
-                const beneficiaries = getBeneficiaries();
-                const listContainer = document.getElementById('beneficiary-list');
-                const noDataMsg = document.getElementById('no-beneficiaries-msg');
-                listContainer.innerHTML = '';
-
-                if (beneficiaries.length === 0) {
-                    listContainer.appendChild(noDataMsg);
-                    noDataMsg.style.display = 'block';
+        // --- NAVIGATION AND VIEW MANAGEMENT ---
+        function showInMain(sectionToShow) {
+            [welcomeSection, formSection, previewSection].forEach(section => {
+                const isTarget = section === sectionToShow;
+                section.classList.toggle('hidden', !isTarget);
+                if (isTarget) {
+                    setTimeout(() => section.classList.remove('opacity-0'), 10);
                 } else {
-                    noDataMsg.style.display = 'none';
-                    beneficiaries.forEach(b => {
-                        const div = document.createElement('div');
-                        div.className = 'bg-gray-700 p-4 rounded-lg flex items-center justify-between transition hover:bg-gray-600';
-                        div.innerHTML = `
-                            <span class="font-medium text-white cursor-pointer view-btn" data-id="${b.id}">${b.name}</span>
-                            <div class="space-x-2">
-                                <button class="edit-btn text-sm text-yellow-400 hover:text-yellow-300" data-id="${b.id}">Edit</button>
-                                <button class="delete-btn text-sm text-red-500 hover:text-red-400" data-id="${b.id}">Delete</button>
-                            </div>
-                        `;
-                        listContainer.appendChild(div);
-                    });
+                    section.classList.add('opacity-0');
                 }
-            }
+            });
+            window.scrollTo(0, 0);
+        }
 
-            function populatePreview(data) {
-                document.getElementById('preview-name').textContent = data.name;
-                document.getElementById('preview-proof-type').textContent = data.proofType;
-                document.getElementById('preview-bank-name').textContent = data.bankName;
-                document.getElementById('preview-branch-code').textContent = data.branchCode;
-                document.getElementById('preview-account-no').textContent = data.accountNo;
-                document.getElementById('preview-account-type').textContent = data.accountType;
-                const previewImagesContainer = document.getElementById('preview-images');
-                previewImagesContainer.innerHTML = '';
-                data.images.forEach(imgSrc => {
-                    const imgContainer = document.createElement('div');
-                    imgContainer.className = 'border border-gray-700 rounded-lg p-2 bg-gray-900 shadow-sm';
-                    const img = document.createElement('img');
-                    img.src = imgSrc;
-                    img.alt = 'Proof of Identity';
-                    img.className = 'rounded-md max-w-full h-auto proof-image';
-                    imgContainer.appendChild(img);
-                    previewImagesContainer.appendChild(imgContainer);
+        // --- DATA HANDLING ---
+        const getBeneficiaries = () => JSON.parse(localStorage.getItem(storageKey)) || [];
+        const saveBeneficiaries = (data) => localStorage.setItem(storageKey, JSON.stringify(data));
+
+        // --- RENDERING FUNCTIONS ---
+        function renderBeneficiaryList() {
+            const beneficiaries = getBeneficiaries();
+            beneficiaryListContainer.innerHTML = '';
+
+            if (beneficiaries.length === 0) {
+                beneficiaryListContainer.appendChild(noDataMsg);
+                noDataMsg.style.display = 'block';
+            } else {
+                noDataMsg.style.display = 'none';
+                beneficiaries.forEach(b => {
+                    const isActive = b.id === activeBeneficiaryId;
+                    const div = document.createElement('div');
+                    div.className = `p-3 rounded-lg flex items-center justify-between cursor-pointer transition ${isActive ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'}`;
+                    div.innerHTML = `
+                        <span class="font-medium text-white view-btn flex-1" data-id="${b.id}">${b.name}</span>
+                        <div class="space-x-2">
+                            <button class="edit-btn text-sm text-yellow-400 hover:text-yellow-300" data-id="${b.id}">Edit</button>
+                            <button class="delete-btn text-sm text-red-500 hover:text-red-400" data-id="${b.id}">Del</button>
+                        </div>
+                    `;
+                    beneficiaryListContainer.appendChild(div);
                 });
             }
+        }
 
-            const readFilesAsBase64 = (files) => Promise.all(Array.from(files).map(f => new Promise((res, rej) => {
-                const reader = new FileReader();
-                reader.onload = () => res(reader.result);
-                reader.onerror = rej;
-                reader.readAsDataURL(f);
-            })));
-
-            // --- EVENT LISTENERS ---
-            document.getElementById('add-new-beneficiary-btn').addEventListener('click', () => {
-                beneficiaryForm.reset();
-                document.getElementById('edit-id').value = '';
-                document.getElementById('form-submit-btn').textContent = 'Save Document';
-                imageInput.required = true;
-                showSection(formSection);
+        function populatePreview(data) {
+            document.getElementById('preview-name').textContent = data.name;
+            document.getElementById('preview-proof-type').textContent = data.proofType;
+            document.getElementById('preview-bank-name').textContent = data.bankName;
+            document.getElementById('preview-branch-code').textContent = data.branchCode;
+            document.getElementById('preview-account-no').textContent = data.accountNo;
+            document.getElementById('preview-account-type').textContent = data.accountType;
+            const previewImagesContainer = document.getElementById('preview-images');
+            previewImagesContainer.innerHTML = '';
+            data.images.forEach(imgSrc => {
+                const imgContainer = document.createElement('div');
+                imgContainer.className = 'border border-gray-700 rounded-lg p-2 bg-gray-900 shadow-sm';
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.alt = 'Proof of Identity';
+                img.className = 'rounded-md max-w-full h-auto proof-image';
+                imgContainer.appendChild(img);
+                previewImagesContainer.appendChild(imgContainer);
             });
+        }
 
-            document.getElementById('cancel-form-btn').addEventListener('click', () => showSection(listSection));
-            document.getElementById('back-to-list-btn').addEventListener('click', () => showSection(listSection));
-            document.getElementById('print-button').addEventListener('click', () => window.print());
+        const readFilesAsBase64 = (files) => Promise.all(Array.from(files).map(f => new Promise((res, rej) => {
+            const reader = new FileReader();
+            reader.onload = () => res(reader.result);
+            reader.onerror = rej;
+            reader.readAsDataURL(f);
+        })));
 
-            document.getElementById('beneficiary-list').addEventListener('click', e => {
-                const beneficiaries = getBeneficiaries();
-                const id = e.target.dataset.id;
-                const beneficiary = beneficiaries.find(b => b.id === id);
+        // --- EVENT HANDLER FUNCTIONS ---
+        function handleAddNew() {
+            activeBeneficiaryId = null;
+            beneficiaryForm.reset();
+            document.getElementById('edit-id').value = '';
+            document.getElementById('form-submit-btn').textContent = 'Save Document';
+            imageInput.required = true;
+            renderBeneficiaryList();
+            showInMain(formSection);
+        }
 
-                if (e.target.classList.contains('view-btn')) {
-                    populatePreview(beneficiary);
-                    showSection(previewSection);
-                }
-                if (e.target.classList.contains('edit-btn')) {
-                    document.getElementById('edit-id').value = beneficiary.id;
-                    document.getElementById('name').value = beneficiary.name;
-                    document.getElementById('proof-type').value = beneficiary.proofType;
-                    document.getElementById('bank-name').value = beneficiary.bankName;
-                    document.getElementById('branch-code').value = beneficiary.branchCode;
-                    document.getElementById('account-no').value = beneficiary.accountNo;
-                    document.getElementById('account-type').value = beneficiary.accountType;
-                    document.getElementById('form-submit-btn').textContent = 'Update Document';
-                    imageInput.required = false; // Not required when editing unless user wants to change
-                    showSection(formSection);
-                }
-                if (e.target.classList.contains('delete-btn')) {
-                    if (confirm(`Are you sure you want to delete ${beneficiary.name}?`)) {
-                        const updatedBeneficiaries = beneficiaries.filter(b => b.id !== id);
-                        saveBeneficiaries(updatedBeneficiaries);
-                        renderBeneficiaryList();
+        function handleCancelForm() {
+            if (activeBeneficiaryId) {
+                const beneficiary = getBeneficiaries().find(b => b.id === activeBeneficiaryId);
+                populatePreview(beneficiary);
+                showInMain(previewSection);
+            } else {
+                showInMain(welcomeSection);
+            }
+        }
+        
+        function handleEditAction(beneficiary) {
+            activeBeneficiaryId = beneficiary.id;
+            document.getElementById('edit-id').value = beneficiary.id;
+            document.getElementById('name').value = beneficiary.name;
+            document.getElementById('proof-type').value = beneficiary.proofType;
+            document.getElementById('bank-name').value = beneficiary.bankName;
+            document.getElementById('branch-code').value = beneficiary.branchCode;
+            document.getElementById('account-no').value = beneficiary.accountNo;
+            document.getElementById('account-type').value = beneficiary.accountType;
+            document.getElementById('form-submit-btn').textContent = 'Update Document';
+            imageInput.required = false;
+            renderBeneficiaryList();
+            showInMain(formSection);
+        }
+
+        // --- EVENT LISTENERS ---
+        document.getElementById('add-new-beneficiary-btn').addEventListener('click', handleAddNew);
+        document.getElementById('cancel-form-btn').addEventListener('click', handleCancelForm);
+        document.getElementById('print-button').addEventListener('click', () => window.print());
+        document.getElementById('edit-preview-btn').addEventListener('click', () => {
+             const beneficiary = getBeneficiaries().find(b => b.id === activeBeneficiaryId);
+             if (beneficiary) handleEditAction(beneficiary);
+        });
+
+        beneficiaryListContainer.addEventListener('click', e => {
+            const beneficiaries = getBeneficiaries();
+            const id = e.target.dataset.id;
+            if (!id) return;
+            const beneficiary = beneficiaries.find(b => b.id === id);
+
+            if (e.target.classList.contains('view-btn')) {
+                activeBeneficiaryId = id;
+                populatePreview(beneficiary);
+                renderBeneficiaryList();
+                showInMain(previewSection);
+            }
+            if (e.target.classList.contains('edit-btn')) {
+                 handleEditAction(beneficiary);
+            }
+            if (e.target.classList.contains('delete-btn')) {
+                if (confirm(`Are you sure you want to delete ${beneficiary.name}?`)) {
+                    const updatedBeneficiaries = beneficiaries.filter(b => b.id !== id);
+                    saveBeneficiaries(updatedBeneficiaries);
+                    if(activeBeneficiaryId === id) {
+                        activeBeneficiaryId = null;
+                        showInMain(welcomeSection);
                     }
+                    renderBeneficiaryList();
                 }
-            });
+            }
+        });
 
-            beneficiaryForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const files = imageInput.files;
-                const editId = document.getElementById('edit-id').value;
+        beneficiaryForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const files = imageInput.files;
+            const editId = document.getElementById('edit-id').value;
 
-                if (!editId && files.length === 0) {
-                     fileError.textContent = 'Please select one or two files for a new entry.';
+            if (!editId && files.length === 0) {
+                 fileError.textContent = 'Please select one or two files for a new entry.';
+                 fileError.classList.remove('hidden');
+                 return;
+            }
+            if (files.length > 2) {
+                fileError.textContent = 'You can upload a maximum of two files.';
+                fileError.classList.remove('hidden');
+                return;
+            }
+            fileError.classList.add('hidden');
+
+            let imageBase64Strings = [];
+            if (files.length > 0) {
+                try {
+                    imageBase64Strings = await readFilesAsBase64(files);
+                } catch (error) {
+                     fileError.textContent = "Could not read one of the files.";
                      fileError.classList.remove('hidden');
                      return;
                 }
-                if (files.length > 2) {
-                    fileError.textContent = 'You can upload a maximum of two files.';
-                    fileError.classList.remove('hidden');
-                    return;
-                }
-                fileError.classList.add('hidden');
-
-                let imageBase64Strings = [];
-                if (files.length > 0) {
-                    try {
-                        imageBase64Strings = await readFilesAsBase64(files);
-                    } catch (error) {
-                         fileError.textContent = "Could not read one of the files.";
-                         fileError.classList.remove('hidden');
-                         return;
-                    }
-                }
-
-                const beneficiaries = getBeneficiaries();
-                let currentData;
-
-                if (editId) { // Editing existing
-                    currentData = beneficiaries.find(b => b.id === editId);
-                    currentData.name = document.getElementById('name').value;
-                    currentData.proofType = document.getElementById('proof-type').value;
-                    currentData.bankName = document.getElementById('bank-name').value;
-                    currentData.branchCode = document.getElementById('branch-code').value;
-                    currentData.accountNo = document.getElementById('account-no').value;
-                    currentData.accountType = document.getElementById('account-type').value;
-                    if (imageBase64Strings.length > 0) {
-                         currentData.images = imageBase64Strings;
-                    }
-                } else { // Creating new
-                    currentData = {
-                        id: Date.now().toString(),
-                        name: document.getElementById('name').value,
-                        proofType: document.getElementById('proof-type').value,
-                        bankName: document.getElementById('bank-name').value,
-                        branchCode: document.getElementById('branch-code').value,
-                        accountNo: document.getElementById('account-no').value,
-                        accountType: document.getElementById('account-type').value,
-                        images: imageBase64Strings,
-                    };
-                    beneficiaries.push(currentData);
-                }
-
-                saveBeneficiaries(beneficiaries);
-                renderBeneficiaryList();
-                populatePreview(currentData);
-                showSection(previewSection);
-            });
-
-            // --- INITIAL LOAD ---
-            renderBeneficiaryList();
-            const beneficiaries = getBeneficiaries();
-            if (beneficiaries.length > 0) {
-                showSection(listSection);
-            } else {
-                showSection(formSection); // If no beneficiaries, show form to add first one
-                document.getElementById('cancel-form-btn').classList.add('hidden'); // Hide cancel on first run
             }
+
+            const beneficiaries = getBeneficiaries();
+            let currentData;
+
+            if (editId) { // Editing existing
+                currentData = beneficiaries.find(b => b.id === editId);
+                currentData.name = document.getElementById('name').value;
+                currentData.proofType = document.getElementById('proof-type').value;
+                currentData.bankName = document.getElementById('bank-name').value;
+                currentData.branchCode = document.getElementById('branch-code').value;
+                currentData.accountNo = document.getElementById('account-no').value;
+                currentData.accountType = document.getElementById('account-type').value;
+                if (imageBase64Strings.length > 0) {
+                     currentData.images = imageBase64Strings;
+                }
+            } else { // Creating new
+                currentData = {
+                    id: Date.now().toString(), name: document.getElementById('name').value, proofType: document.getElementById('proof-type').value, bankName: document.getElementById('bank-name').value, branchCode: document.getElementById('branch-code').value, accountNo: document.getElementById('account-no').value, accountType: document.getElementById('account-type').value, images: imageBase64Strings,
+                };
+                beneficiaries.push(currentData);
+            }
+
+            saveBeneficiaries(beneficiaries);
+            activeBeneficiaryId = currentData.id;
+            renderBeneficiaryList();
+            populatePreview(currentData);
+            showInMain(previewSection);
         });
+
+        // --- INITIAL LOAD ---
+        renderBeneficiaryList();
+        showInMain(welcomeSection);
+    });
     </script>
 </body>
 </html>
+
 
