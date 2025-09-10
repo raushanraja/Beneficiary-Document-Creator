@@ -124,7 +124,7 @@
             <!-- Form Section -->
             <div id="form-section" class="main-content-section hidden bg-gray-800 p-8 rounded-xl shadow-lg">
                  <h1 class="text-3xl font-bold text-white mb-6">Beneficiary Details</h1>
-                <form id="beneficiary-form" class="space-y-6">
+                <form id="beneficiary-form" class="space-y-6" novalidate>
                     <input type="hidden" id="edit-id" name="edit-id">
                     <!-- Personal Details -->
                     <div>
@@ -426,7 +426,6 @@
             beneficiaryForm.reset();
             document.getElementById('edit-id').value = '';
             document.getElementById('form-submit-btn').textContent = 'Save Document';
-            imageInput.required = true;
             croppedImagesData = [];
             renderFormThumbnails();
             renderBeneficiaryList();
@@ -455,7 +454,6 @@
             document.getElementById('account-no').value = beneficiary.accountNo;
             document.getElementById('account-type').value = beneficiary.accountType;
             document.getElementById('form-submit-btn').textContent = 'Update Document';
-            imageInput.required = false;
             renderFormThumbnails();
             renderBeneficiaryList();
             showInMain(formSection);
@@ -521,16 +519,34 @@
 
         beneficiaryForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const editId = document.getElementById('edit-id').value;
+
+            // Custom validation for other required fields
+            let isFormValid = true;
+            beneficiaryForm.querySelectorAll('[required]').forEach(input => {
+                if (!input.value) {
+                    isFormValid = false;
+                    // Optionally, add a visual indicator for the invalid field
+                    input.classList.add('border-red-500');
+                } else {
+                    input.classList.remove('border-red-500');
+                }
+            });
+
 
             if (croppedImagesData.length === 0) {
                  fileError.textContent = 'Please add at least one identity proof image.';
                  fileError.classList.remove('hidden');
-                 return;
+                 isFormValid = false;
+            } else {
+                fileError.classList.add('hidden');
             }
-            fileError.classList.add('hidden');
+
+            if (!isFormValid) {
+                return;
+            }
 
             const beneficiaries = getBeneficiaries();
+            const editId = document.getElementById('edit-id').value;
             let currentData;
             
             if (editId) { // Editing existing
