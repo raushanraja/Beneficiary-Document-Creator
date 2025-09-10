@@ -32,47 +32,42 @@
             background: #6b7280; /* gray-500 */
         }
         
-        /* Cropper.js modal styles */
-        #crop-modal-container {
+        /* Modal styles */
+        #crop-modal-container, #edit-modal-container {
             max-height: 90vh;
         }
         .cropper-container {
             max-height: 70vh;
         }
+        #image-editor-canvas {
+            max-width: 100%;
+            max-height: 70vh;
+            cursor: crosshair;
+        }
 
         /* Print-specific styles */
         @media print {
-            body, #preview-section, #printable-area {
-                background-color: #ffffff !important;
-                color: #000000 !important;
-            }
-             h1, h2, strong, span {
-                color: #000000 !important;
-            }
-            .print-bg-white {
-                background-color: #ffffff !important;
-            }
-            .print-text-black {
-                color: #000000 !important;
-            }
-            .print-details-box {
-                background-color: #f9fafb !important; /* A light gray */
-            }
             body {
+                background-color: #ffffff !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
             .no-print {
                 display: none !important;
             }
-            #sidebar-section, #button-container {
-                display: none !important;
-            }
             main {
                 padding: 0 !important;
                 overflow: visible !important;
             }
-            #preview-section {
+            
+            /* Styles for printing the main details page */
+            .printing-details #sidebar-section, 
+            .printing-details #button-container,
+            .printing-details #attestation-section,
+            .printing-details #standalone-attest-section {
+                display: none !important;
+            }
+            .printing-details #preview-section {
                 display: block !important;
                 width: 100%;
                 position: absolute;
@@ -83,13 +78,35 @@
                 border: none;
                 box-shadow: none;
             }
-            #printable-area {
-                width: 100%;
-                height: 100%;
+             .printing-details #preview-section, .printing-details #printable-area {
+                background-color: #ffffff !important;
+                color: #000000 !important;
             }
-            .proof-image {
+            .printing-details h1, .printing-details h2, .printing-details strong, .printing-details span {
+                color: #000000 !important;
+            }
+            .printing-details .print-details-box {
+                background-color: #f9fafb !important;
+            }
+             .printing-details .proof-image {
                 max-width: 90% !important;
                 page-break-inside: avoid;
+            }
+
+            /* Styles for printing the attestation page */
+            .printing-attestation #sidebar-section,
+            .printing-attestation #preview-section,
+            .printing-attestation #standalone-attest-section {
+                display: none !important;
+            }
+             .printing-attestation #attestation-section {
+                display: block !important;
+                width: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                margin: 0;
+                padding: 15mm;
             }
         }
     </style>
@@ -99,10 +116,15 @@
     <div class="flex h-screen">
         <!-- Sidebar -->
         <aside id="sidebar-section" class="w-full max-w-sm bg-gray-800 flex flex-col border-r border-gray-700 no-print">
-            <div class="p-6 border-b border-gray-700 flex justify-between items-center">
-                 <h1 class="text-2xl font-bold text-white">Beneficiaries</h1>
-                 <button id="add-new-beneficiary-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all text-sm">
-                    + Add New
+            <div class="p-6 border-b border-gray-700">
+                 <div class="flex justify-between items-center mb-4">
+                    <h1 class="text-2xl font-bold text-white">Beneficiaries</h1>
+                    <button id="add-new-beneficiary-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all text-sm">
+                        + Add New
+                    </button>
+                </div>
+                <button id="standalone-attest-btn" class="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-all text-sm">
+                    Create Self-Attested Doc
                 </button>
             </div>
             <div id="beneficiary-list" class="overflow-y-auto flex-1 p-4 space-y-2">
@@ -118,7 +140,7 @@
             <div id="welcome-section" class="main-content-section h-full flex flex-col items-center justify-center text-center">
                 <svg class="w-24 h-24 text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                 <h2 class="text-2xl font-bold text-white">Beneficiary Document Creator</h2>
-                <p class="text-gray-400 mt-2 max-w-md">Select a beneficiary from the list to view their details, or click "Add New" to create a new entry.</p>
+                <p class="text-gray-400 mt-2 max-w-md">Select a beneficiary, add a new one, or use the standalone tool to create a self-attested document.</p>
             </div>
 
             <!-- Form Section -->
@@ -150,7 +172,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Bank Details -->
                     <div>
                         <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-2 mb-4">Bank Details</h2>
@@ -179,7 +200,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- File Upload -->
                     <div>
                         <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-2 mb-4">Upload Identity Proof Images</h2>
@@ -195,7 +215,6 @@
                         <p class="text-gray-500 text-xs mt-2">You can add multiple images (e.g., front and back of ID).</p>
                         <p id="file-error" class="text-red-500 text-sm mt-1 hidden">Please add at least one identity proof image.</p>
                     </div>
-                    
                     <!-- Buttons -->
                     <div class="text-center pt-4 flex gap-4 justify-end">
                         <button type="button" id="cancel-form-btn" class="w-full md:w-auto bg-gray-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all">Cancel</button>
@@ -205,38 +224,87 @@
             </div>
 
             <!-- Preview Section -->
-            <div id="preview-section" class="main-content-section hidden bg-gray-800 p-8 rounded-xl shadow-lg print-bg-white">
+            <div id="preview-section" class="main-content-section hidden bg-gray-800 p-8 rounded-xl shadow-lg">
                 <div id="printable-area">
                      <div class="flex justify-between items-start mb-8 border-b-2 border-gray-700 pb-4">
-                        <h1 class="text-3xl font-bold text-white print-text-black">Beneficiary Details</h1>
+                        <h1 class="text-3xl font-bold text-white">Beneficiary Details</h1>
                         <div id="button-container" class="text-center space-x-2 no-print">
+                            <button id="attestation-pdf-btn" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-all text-sm">Self-Attest PDF</button>
                             <button id="print-button" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition-all text-sm">Print</button>
                             <button id="edit-preview-btn" class="bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600 transition-all text-sm">Edit</button>
                         </div>
                     </div>
-                    
                     <!-- Personal Information -->
-                    <h2 class="text-2xl font-semibold text-gray-200 border-b border-gray-700 pb-2 mb-6 print-text-black">Personal Information</h2>
+                    <h2 class="text-2xl font-semibold text-gray-200 border-b border-gray-700 pb-2 mb-6">Personal Information</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 text-lg">
-                        <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Name:</strong> <span id="preview-name" class="text-white print-text-black"></span></div>
-                        <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Proof of ID:</strong> <span id="preview-proof-type" class="text-white print-text-black"></span></div>
-                        <div class="p-4 bg-gray-700 rounded-lg print-details-box md:col-span-2"><strong class="font-medium text-gray-400 print-text-black">ID Number:</strong> <span id="preview-id-number" class="text-white print-text-black"></span></div>
+                        <div class="p-4 bg-gray-700 rounded-lg"><strong class="font-medium text-gray-400">Name:</strong> <span id="preview-name" class="text-white"></span></div>
+                        <div class="p-4 bg-gray-700 rounded-lg"><strong class="font-medium text-gray-400">Proof of ID:</strong> <span id="preview-proof-type" class="text-white"></span></div>
+                        <div class="p-4 bg-gray-700 rounded-lg md:col-span-2"><strong class="font-medium text-gray-400">ID Number:</strong> <span id="preview-id-number" class="text-white"></span></div>
                     </div>
-
                     <!-- Bank Details -->
-                    <h2 class="text-2xl font-semibold text-gray-200 mt-10 border-b border-gray-700 pb-2 mb-6 print-text-black">Bank Details</h2>
+                    <h2 class="text-2xl font-semibold text-gray-200 mt-10 border-b border-gray-700 pb-2 mb-6">Bank Details</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 text-lg">
-                        <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Bank Name:</strong> <span id="preview-bank-name" class="text-white print-text-black"></span></div>
-                        <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Branch Code:</strong> <span id="preview-branch-code" class="text-white print-text-black"></span></div>
-                        <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Account No:</strong> <span id="preview-account-no" class="text-white print-text-black"></span></div>
-                        <div class="p-4 bg-gray-700 rounded-lg print-details-box"><strong class="font-medium text-gray-400 print-text-black">Account Type:</strong> <span id="preview-account-type" class="text-white print-text-black"></span></div>
+                        <div class="p-4 bg-gray-700 rounded-lg"><strong class="font-medium text-gray-400">Bank Name:</strong> <span id="preview-bank-name" class="text-white"></span></div>
+                        <div class="p-4 bg-gray-700 rounded-lg"><strong class="font-medium text-gray-400">Branch Code:</strong> <span id="preview-branch-code" class="text-white"></span></div>
+                        <div class="p-4 bg-gray-700 rounded-lg"><strong class="font-medium text-gray-400">Account No:</strong> <span id="preview-account-no" class="text-white"></span></div>
+                        <div class="p-4 bg-gray-700 rounded-lg"><strong class="font-medium text-gray-400">Account Type:</strong> <span id="preview-account-type" class="text-white"></span></div>
                     </div>
-
-                    <h2 class="text-2xl font-semibold text-gray-200 mt-10 border-b border-gray-700 pb-2 mb-6 print-text-black">Proof of Identity Images</h2>
+                    <!-- Proof of Identity Images -->
+                    <h2 class="text-2xl font-semibold text-gray-200 mt-10 border-b border-gray-700 pb-2 mb-6">Proof of Identity Images</h2>
                     <div id="preview-images" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6 place-items-center">
                     </div>
                 </div>
             </div>
+
+             <!-- Standalone Self-Attestation Tool Section -->
+            <div id="standalone-attest-section" class="main-content-section hidden bg-gray-800 p-8 rounded-xl shadow-lg">
+                <h1 class="text-3xl font-bold text-white mb-6">Create Self-Attested Document</h1>
+                <p class="text-gray-400 mb-6">Upload images, crop and redact if needed, and generate a printable document.</p>
+                
+                <!-- File Upload -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-2 mb-4">1. Upload Images</h2>
+                    <label for="proof-images-standalone" class="inline-block bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all text-sm cursor-pointer">
+                        + Add Image(s)
+                    </label>
+                    <input type="file" id="proof-images-standalone" name="proof-images-standalone" accept="image/*" multiple class="hidden">
+                    
+                    <div id="image-previews-standalone" class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        <!-- Thumbnails will be injected here -->
+                    </div>
+                     <p class="text-xs text-gray-500 mt-2">After adding images, click the edit icon on a thumbnail to redact sections.</p>
+                </div>
+                 <!-- Options -->
+                <div class="mt-8">
+                    <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-2 mb-4">2. Options</h2>
+                    <div class="flex items-center">
+                        <input id="add-watermark-checkbox" type="checkbox" checked class="h-4 w-4 rounded border-gray-500 text-indigo-600 bg-gray-700 focus:ring-indigo-500">
+                        <label for="add-watermark-checkbox" class="ml-2 block text-sm text-gray-300">Add "Self-Attested" watermark</label>
+                    </div>
+                </div>
+                
+                <!-- Buttons -->
+                <div class="text-center pt-8 flex gap-4 justify-end">
+                     <p id="standalone-file-error" class="text-red-500 text-sm self-center mr-auto hidden">Please add at least one image.</p>
+                    <button type="button" id="clear-standalone-btn" class="w-full md:w-auto bg-gray-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all">Clear All</button>
+                    <button type="button" id="generate-standalone-attestation-btn" class="w-full md:w-auto bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition-all">Generate PDF Page</button>
+                </div>
+            </div>
+
+            <!-- Self-Attestation Section (for printing) -->
+            <div id="attestation-section" class="main-content-section hidden bg-gray-800 p-8 rounded-xl shadow-lg">
+                <div class="flex justify-between items-center mb-6 no-print">
+                    <h1 class="text-2xl font-bold text-white">Self-Attestation Document</h1>
+                     <div>
+                        <button id="back-to-previous-btn" class="bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition-all text-sm">Back</button>
+                        <button id="print-attestation-btn" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition-all text-sm ml-2">Print PDF</button>
+                    </div>
+                </div>
+                <div id="attestation-images-container" class="bg-white p-4 rounded-md space-y-4">
+                     <!-- Images with watermarks will be injected here -->
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -254,26 +322,41 @@
         </div>
     </div>
 
+    <!-- Image Edit/Redact Modal -->
+    <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden no-print z-50">
+        <div id="edit-modal-container" class="bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-4xl">
+            <h2 class="text-2xl font-bold text-white mb-4">Redact Image</h2>
+            <p class="text-sm text-gray-400 mb-4">Click and drag on the image to draw white boxes over sections you want to hide.</p>
+            <div class="bg-gray-900 p-2 rounded-lg flex justify-center items-center">
+                <canvas id="image-editor-canvas"></canvas>
+            </div>
+            <div class="mt-6 flex justify-end gap-4">
+                <button id="reset-edit-btn" class="bg-yellow-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-yellow-700 transition">Reset</button>
+                <button id="cancel-edit-btn" class="bg-gray-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-700 transition">Cancel</button>
+                <button id="save-edit-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const welcomeSection = document.getElementById('welcome-section');
         const formSection = document.getElementById('form-section');
         const previewSection = document.getElementById('preview-section');
+        const attestationSection = document.getElementById('attestation-section');
+        const standaloneAttestSection = document.getElementById('standalone-attest-section');
         
         const beneficiaryForm = document.getElementById('beneficiary-form');
         const imageInput = document.getElementById('proof-images');
+        const imageInputStandalone = document.getElementById('proof-images-standalone');
         const fileError = document.getElementById('file-error');
         const beneficiaryListContainer = document.getElementById('beneficiary-list');
         const noDataMsg = document.getElementById('no-beneficiaries-msg');
-        const imagePreviewsContainer = document.getElementById('image-previews');
 
-        // Cropping Modal elements
+        // Modals
         const cropModal = document.getElementById('crop-modal');
-        const imageToCrop = document.getElementById('image-to-crop');
-        const cropModalTitle = document.getElementById('crop-modal-title');
-        const confirmCropBtn = document.getElementById('confirm-crop-btn');
-        const cancelCropBtn = document.getElementById('cancel-crop-btn');
+        const editModal = document.getElementById('edit-modal');
         
         const storageKey = 'beneficiariesData';
 
@@ -282,11 +365,21 @@
         let filesToCrop = [];
         let currentCropIndex = 0;
         let croppedImagesData = [];
+        let attestationCameFrom = null; // 'preview' or 'standalone'
+        let isFreeCropMode = false;
+
+        // --- Redaction Tool State ---
+        const editorCanvas = document.getElementById('image-editor-canvas');
+        const editorCtx = editorCanvas.getContext('2d');
+        let isDrawing = false;
+        let startX, startY;
+        let originalImageForEdit = null;
+        let editingImageIndex = -1;
 
 
         // --- NAVIGATION AND VIEW MANAGEMENT ---
         function showInMain(sectionToShow) {
-            [welcomeSection, formSection, previewSection].forEach(section => {
+            [welcomeSection, formSection, previewSection, attestationSection, standaloneAttestSection].forEach(section => {
                 const isTarget = section === sectionToShow;
                 section.classList.toggle('hidden', !isTarget);
                 if (isTarget) {
@@ -328,16 +421,35 @@
             }
         }
 
-        function renderFormThumbnails() {
-            imagePreviewsContainer.innerHTML = '';
+        function createThumbnail(imgSrc, index) {
+            const thumbWrapper = document.createElement('div');
+            thumbWrapper.className = 'relative group';
+            thumbWrapper.innerHTML = `
+                <img src="${imgSrc}" class="w-full h-24 object-cover rounded-md">
+                <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button type="button" data-index="${index}" data-action="edit-image" class="text-white bg-blue-600 h-8 w-8 rounded-full flex items-center justify-center" title="Redact Image">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z"></path></svg>
+                    </button>
+                    <button type="button" data-index="${index}" data-action="remove-image" class="text-white bg-red-600 h-8 w-8 rounded-full flex items-center justify-center" title="Remove Image">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            `;
+            return thumbWrapper;
+        }
+
+        function renderThumbnails() {
+            const formPreviewsContainer = document.getElementById('image-previews');
+            const standalonePreviewsContainer = document.getElementById('image-previews-standalone');
+            formPreviewsContainer.innerHTML = '';
+            standalonePreviewsContainer.innerHTML = '';
+            
+            const activeContainer = !formSection.classList.contains('hidden') 
+                ? formPreviewsContainer 
+                : standalonePreviewsContainer;
+
             croppedImagesData.forEach((imgSrc, index) => {
-                const thumbWrapper = document.createElement('div');
-                thumbWrapper.className = 'relative group';
-                thumbWrapper.innerHTML = `
-                    <img src="${imgSrc}" class="w-full h-24 object-cover rounded-md">
-                    <button type="button" data-index="${index}" class="remove-image-btn absolute top-1 right-1 bg-red-600 text-white rounded-full h-6 w-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">&times;</button>
-                `;
-                imagePreviewsContainer.appendChild(thumbWrapper);
+                activeContainer.appendChild(createThumbnail(imgSrc, index));
             });
         }
 
@@ -363,152 +475,252 @@
             });
         }
 
+        function populateAttestationView(images) {
+            const container = document.getElementById('attestation-images-container');
+            const addWatermark = document.getElementById('add-watermark-checkbox').checked;
+            container.innerHTML = '';
+            images.forEach(imgSrc => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'relative inline-block p-2 border border-gray-200';
+                wrapper.style.pageBreakInside = 'avoid';
+
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.className = 'max-w-full h-auto';
+                wrapper.appendChild(img);
+
+                if (addWatermark) {
+                    const watermark = document.createElement('div');
+                    watermark.textContent = 'Self-Attested';
+                    watermark.className = 'absolute text-red-500 font-bold text-5xl opacity-50 transform -rotate-30 pointer-events-none';
+                    watermark.style.top = '50%';
+                    watermark.style.left = '50%';
+                    watermark.style.transform = 'translate(-50%, -50%) rotate(-30deg)';
+                    wrapper.appendChild(watermark);
+                }
+                container.appendChild(wrapper);
+            });
+        }
+
+
         // --- IMAGE CROPPING LOGIC ---
         function openCropModal() {
             if (filesToCrop.length === 0) return;
             currentCropIndex = 0;
-            // The line that was incorrectly resetting the images array has been removed from here.
             cropModal.classList.remove('hidden');
             loadNextImageToCrop();
         }
 
         function loadNextImageToCrop() {
-            if (cropper) {
-                cropper.destroy();
-            }
+            if (cropper) cropper.destroy();
             const file = filesToCrop[currentCropIndex];
             const reader = new FileReader();
             reader.onload = (e) => {
+                const imageToCrop = document.getElementById('image-to-crop');
                 imageToCrop.src = e.target.result;
-                cropper = new Cropper(imageToCrop, {
-                    aspectRatio: 1.5, // Good for ID cards
-                    viewMode: 1,
-                    background: false
-                });
-                cropModalTitle.textContent = `Crop Image (${currentCropIndex + 1} of ${filesToCrop.length})`;
+                const cropperOptions = { viewMode: 1, background: false };
+                if (!isFreeCropMode) {
+                    cropperOptions.aspectRatio = 1.5;
+                }
+                cropper = new Cropper(imageToCrop, cropperOptions);
+                document.getElementById('crop-modal-title').textContent = `Crop Image (${currentCropIndex + 1} of ${filesToCrop.length})`;
             };
             reader.readAsDataURL(file);
         }
 
         function handleConfirmCrop() {
             if (!cropper) return;
-            const croppedCanvas = cropper.getCroppedCanvas();
-            croppedImagesData.push(croppedCanvas.toDataURL('image/jpeg', 0.9));
+            croppedImagesData.push(cropper.getCroppedCanvas().toDataURL('image/jpeg', 0.9));
             currentCropIndex++;
             if (currentCropIndex < filesToCrop.length) {
                 loadNextImageToCrop();
             } else {
-                // Last image cropped, close modal and update UI
                 cropModal.classList.add('hidden');
-                if (cropper) {
-                    cropper.destroy();
-                    cropper = null;
-                }
-                imageInput.value = ''; // Clear input for next selection
-                renderFormThumbnails();
+                if (cropper) cropper.destroy();
+                cropper = null;
+                imageInput.value = '';
+                imageInputStandalone.value = '';
+                renderThumbnails();
             }
         }
+        
+        // --- IMAGE REDACTION LOGIC ---
+        function openEditModal(index) {
+            editingImageIndex = index;
+            originalImageForEdit = new Image();
+            originalImageForEdit.onload = () => {
+                editorCanvas.width = originalImageForEdit.width;
+                editorCanvas.height = originalImageForEdit.height;
+                editorCtx.drawImage(originalImageForEdit, 0, 0);
+                editModal.classList.remove('hidden');
+            };
+            originalImageForEdit.src = croppedImagesData[index];
+        }
+        
+        editorCanvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            const rect = editorCanvas.getBoundingClientRect();
+            startX = (e.clientX - rect.left) * (editorCanvas.width / rect.width);
+            startY = (e.clientY - rect.top) * (editorCanvas.height / rect.height);
+        });
 
-        function handleCancelCrop() {
-            cropModal.classList.add('hidden');
-            if (cropper) {
-                cropper.destroy();
-                cropper = null;
-            }
-            // Clear the file input but don't clear already cropped data
-            imageInput.value = '';
+        editorCanvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            const rect = editorCanvas.getBoundingClientRect();
+            const currentX = (e.clientX - rect.left) * (editorCanvas.width / rect.width);
+            const currentY = (e.clientY - rect.top) * (editorCanvas.height / rect.height);
+            
+            // Redraw original image to clear previous temp rectangle
+            editorCtx.drawImage(originalImageForEdit, 0, 0);
+            
+            // Draw temp rectangle
+            editorCtx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            editorCtx.fillRect(startX, startY, currentX - startX, currentY - startY);
+            editorCtx.strokeStyle = 'rgba(200, 200, 200, 1)';
+            editorCtx.strokeRect(startX, startY, currentX - startX, currentY - startY);
+        });
+
+        editorCanvas.addEventListener('mouseup', (e) => {
+            if (!isDrawing) return;
+            isDrawing = false;
+            const rect = editorCanvas.getBoundingClientRect();
+            const endX = (e.clientX - rect.left) * (editorCanvas.width / rect.width);
+            const endY = (e.clientY - rect.top) * (editorCanvas.height / rect.height);
+
+            // Draw final, solid white rectangle
+            editorCtx.fillStyle = 'white';
+            editorCtx.fillRect(startX, startY, endX - startX, endY - startY);
+        });
+
+        function saveEditChanges() {
+            croppedImagesData[editingImageIndex] = editorCanvas.toDataURL('image/jpeg', 0.9);
+            editModal.classList.add('hidden');
+            renderThumbnails();
         }
 
 
         // --- EVENT HANDLER FUNCTIONS ---
         function handleAddNew() {
             activeBeneficiaryId = null;
+            isFreeCropMode = false;
             beneficiaryForm.reset();
             document.getElementById('edit-id').value = '';
             document.getElementById('form-submit-btn').textContent = 'Save Document';
             croppedImagesData = [];
-            renderFormThumbnails();
+            renderThumbnails();
             renderBeneficiaryList();
             showInMain(formSection);
         }
 
-        function handleCancelForm() {
-            if (activeBeneficiaryId) {
-                const beneficiary = getBeneficiaries().find(b => b.id === activeBeneficiaryId);
-                populatePreview(beneficiary);
-                showInMain(previewSection);
-            } else {
-                showInMain(welcomeSection);
-            }
-        }
-        
-        function handleEditAction(beneficiary) {
-            activeBeneficiaryId = beneficiary.id;
-            croppedImagesData = [...beneficiary.images];
-            document.getElementById('edit-id').value = beneficiary.id;
-            document.getElementById('name').value = beneficiary.name;
-            document.getElementById('proof-type').value = beneficiary.proofType;
-            document.getElementById('id-number').value = beneficiary.idNumber;
-            document.getElementById('bank-name').value = beneficiary.bankName;
-            document.getElementById('branch-code').value = beneficiary.branchCode;
-            document.getElementById('account-no').value = beneficiary.accountNo;
-            document.getElementById('account-type').value = beneficiary.accountType;
-            document.getElementById('form-submit-btn').textContent = 'Update Document';
-            renderFormThumbnails();
-            renderBeneficiaryList();
-            showInMain(formSection);
+        function handlePrint(printContext) {
+            document.body.classList.add(printContext);
+            window.print();
+            document.body.classList.remove(printContext);
         }
 
         // --- EVENT LISTENERS ---
         document.getElementById('add-new-beneficiary-btn').addEventListener('click', handleAddNew);
-        document.getElementById('cancel-form-btn').addEventListener('click', handleCancelForm);
-        document.getElementById('print-button').addEventListener('click', () => window.print());
-        document.getElementById('edit-preview-btn').addEventListener('click', () => {
-             const beneficiary = getBeneficiaries().find(b => b.id === activeBeneficiaryId);
-             if (beneficiary) handleEditAction(beneficiary);
+        document.getElementById('standalone-attest-btn').addEventListener('click', () => {
+            activeBeneficiaryId = null;
+            isFreeCropMode = true;
+            croppedImagesData = [];
+            renderThumbnails();
+            renderBeneficiaryList();
+            showInMain(standaloneAttestSection);
+        });
+        document.getElementById('print-button').addEventListener('click', () => handlePrint('printing-details'));
+        document.getElementById('print-attestation-btn').addEventListener('click', () => handlePrint('printing-attestation'));
+        
+        document.getElementById('attestation-pdf-btn').addEventListener('click', () => {
+            const beneficiary = getBeneficiaries().find(b => b.id === activeBeneficiaryId);
+            if (beneficiary) {
+                attestationCameFrom = 'preview';
+                document.getElementById('add-watermark-checkbox').checked = true; // Default to on for beneficiaries
+                populateAttestationView(beneficiary.images);
+                showInMain(attestationSection);
+            }
         });
 
-        // Crop Modal Listeners
-        confirmCropBtn.addEventListener('click', handleConfirmCrop);
-        cancelCropBtn.addEventListener('click', handleCancelCrop);
+        document.getElementById('back-to-previous-btn').addEventListener('click', () => {
+            showInMain(attestationCameFrom === 'standalone' ? standaloneAttestSection : previewSection);
+        });
 
-        imagePreviewsContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('remove-image-btn')) {
-                const indexToRemove = parseInt(e.target.dataset.index, 10);
+        document.getElementById('generate-standalone-attestation-btn').addEventListener('click', () => {
+            const errorEl = document.getElementById('standalone-file-error');
+            if (croppedImagesData.length === 0) {
+                errorEl.classList.remove('hidden'); return;
+            }
+            errorEl.classList.add('hidden');
+            attestationCameFrom = 'standalone';
+            populateAttestationView(croppedImagesData);
+            showInMain(attestationSection);
+        });
+        
+        document.getElementById('clear-standalone-btn').addEventListener('click', () => {
+            croppedImagesData = [];
+            renderThumbnails();
+        });
+
+        // Modal Buttons
+        document.getElementById('confirm-crop-btn').addEventListener('click', handleConfirmCrop);
+        document.getElementById('cancel-crop-btn').addEventListener('click', () => cropModal.classList.add('hidden'));
+        document.getElementById('save-edit-btn').addEventListener('click', saveEditChanges);
+        document.getElementById('cancel-edit-btn').addEventListener('click', () => editModal.classList.add('hidden'));
+        document.getElementById('reset-edit-btn').addEventListener('click', () => {
+            editorCtx.drawImage(originalImageForEdit, 0, 0);
+        });
+
+        // Main content event delegation for image actions
+        document.querySelector('main').addEventListener('click', (e) => {
+            const removeBtn = e.target.closest('[data-action="remove-image"]');
+            const editBtn = e.target.closest('[data-action="edit-image"]');
+            if (removeBtn) {
+                const indexToRemove = parseInt(removeBtn.dataset.index, 10);
                 croppedImagesData.splice(indexToRemove, 1);
-                renderFormThumbnails();
+                renderThumbnails();
+            } else if (editBtn) {
+                 const indexToEdit = parseInt(editBtn.dataset.index, 10);
+                 openEditModal(indexToEdit);
             }
         });
         
-        imageInput.addEventListener('change', () => {
-            const files = Array.from(imageInput.files);
+        function handleImageInputChange(e) {
+            const files = Array.from(e.target.files);
             fileError.classList.add('hidden');
+            document.getElementById('standalone-file-error').classList.add('hidden');
             if (files.length > 0) {
                 filesToCrop = files;
                 openCropModal();
             }
-        });
+        }
+        imageInput.addEventListener('change', handleImageInputChange);
+        imageInputStandalone.addEventListener('change', handleImageInputChange);
 
+        // Beneficiary List actions
         beneficiaryListContainer.addEventListener('click', e => {
             const beneficiaries = getBeneficiaries();
-            const id = e.target.dataset.id;
+            const id = e.target.closest('[data-id]')?.dataset.id;
             if (!id) return;
             const beneficiary = beneficiaries.find(b => b.id === id);
 
-            if (e.target.classList.contains('view-btn')) {
+            if (e.target.closest('.view-btn')) {
                 activeBeneficiaryId = id;
                 populatePreview(beneficiary);
                 renderBeneficiaryList();
                 showInMain(previewSection);
             }
-            if (e.target.classList.contains('edit-btn')) {
-                 handleEditAction(beneficiary);
+            if (e.target.closest('.edit-btn')) {
+                 const editId = e.target.closest('.edit-btn').dataset.id;
+                 const benToEdit = beneficiaries.find(b => b.id === editId);
+                 handleEditAction(benToEdit);
             }
-            if (e.target.classList.contains('delete-btn')) {
-                if (confirm(`Are you sure you want to delete ${beneficiary.name}?`)) {
-                    const updatedBeneficiaries = beneficiaries.filter(b => b.id !== id);
+            if (e.target.closest('.delete-btn')) {
+                const deleteId = e.target.closest('.delete-btn').dataset.id;
+                const benToDelete = beneficiaries.find(b => b.id === deleteId);
+                if (confirm(`Are you sure you want to delete ${benToDelete.name}?`)) {
+                    const updatedBeneficiaries = beneficiaries.filter(b => b.id !== deleteId);
                     saveBeneficiaries(updatedBeneficiaries);
-                    if(activeBeneficiaryId === id) {
+                    if(activeBeneficiaryId === deleteId) {
                         activeBeneficiaryId = null;
                         showInMain(welcomeSection);
                     }
@@ -517,63 +729,34 @@
             }
         });
 
+        // Beneficiary Form submission
         beneficiaryForm.addEventListener('submit', function(e) {
             e.preventDefault();
-
-            // Custom validation for other required fields
+            // ... (rest of form submission logic is unchanged)
             let isFormValid = true;
             beneficiaryForm.querySelectorAll('[required]').forEach(input => {
-                if (!input.value) {
-                    isFormValid = false;
-                    // Optionally, add a visual indicator for the invalid field
-                    input.classList.add('border-red-500');
-                } else {
-                    input.classList.remove('border-red-500');
-                }
+                if (!input.value) { isFormValid = false; input.classList.add('border-red-500'); } 
+                else { input.classList.remove('border-red-500'); }
             });
-
-
             if (croppedImagesData.length === 0) {
                  fileError.textContent = 'Please add at least one identity proof image.';
-                 fileError.classList.remove('hidden');
-                 isFormValid = false;
-            } else {
-                fileError.classList.add('hidden');
-            }
-
-            if (!isFormValid) {
-                return;
-            }
+                 fileError.classList.remove('hidden'); isFormValid = false;
+            } else { fileError.classList.add('hidden'); }
+            if (!isFormValid) return;
 
             const beneficiaries = getBeneficiaries();
             const editId = document.getElementById('edit-id').value;
             let currentData;
-            
-            if (editId) { // Editing existing
+            const formData = {
+                name: document.getElementById('name').value, proofType: document.getElementById('proof-type').value, idNumber: document.getElementById('id-number').value, bankName: document.getElementById('bank-name').value, branchCode: document.getElementById('branch-code').value, accountNo: document.getElementById('account-no').value, accountType: document.getElementById('account-type').value, images: croppedImagesData,
+            };
+            if (editId) {
                 currentData = beneficiaries.find(b => b.id === editId);
-                currentData.name = document.getElementById('name').value;
-                currentData.proofType = document.getElementById('proof-type').value;
-                currentData.idNumber = document.getElementById('id-number').value;
-                currentData.bankName = document.getElementById('bank-name').value;
-                currentData.branchCode = document.getElementById('branch-code').value;
-                currentData.accountNo = document.getElementById('account-no').value;
-                currentData.accountType = document.getElementById('account-type').value;
-                currentData.images = croppedImagesData; // Always update with the current list
-            } else { // Creating new
-                currentData = {
-                    id: Date.now().toString(),
-                    name: document.getElementById('name').value,
-                    proofType: document.getElementById('proof-type').value,
-                    idNumber: document.getElementById('id-number').value,
-                    bankName: document.getElementById('bank-name').value,
-                    branchCode: document.getElementById('branch-code').value,
-                    accountNo: document.getElementById('account-no').value,
-                    accountType: document.getElementById('account-type').value,
-                    images: croppedImagesData,
-                };
+                Object.assign(currentData, formData);
+            } else {
+                currentData = { id: Date.now().toString(), ...formData };
                 beneficiaries.push(currentData);
             }
-
             saveBeneficiaries(beneficiaries);
             activeBeneficiaryId = currentData.id;
             renderBeneficiaryList();
