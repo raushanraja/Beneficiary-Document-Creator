@@ -98,7 +98,7 @@
 
     <div class="flex h-screen">
         <!-- Sidebar -->
-        <aside class="w-full max-w-sm bg-gray-800 flex flex-col border-r border-gray-700 no-print">
+        <aside id="sidebar-section" class="w-full max-w-sm bg-gray-800 flex flex-col border-r border-gray-700 no-print">
             <div class="p-6 border-b border-gray-700 flex justify-between items-center">
                  <h1 class="text-2xl font-bold text-white">Beneficiaries</h1>
                  <button id="add-new-beneficiary-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all text-sm">
@@ -183,14 +183,17 @@
                     <!-- File Upload -->
                     <div>
                         <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-2 mb-4">Upload Identity Proof Images</h2>
-                        <label for="proof-images" class="block text-sm font-medium text-gray-400 mb-1">Upload one or two images (Front & Back)</label>
-                        <input type="file" id="proof-images" name="proof-images" accept="image/*" multiple class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-                        <div id="image-status" class="text-sm text-green-400 mt-2 hidden">
-                            <span>Images successfully cropped.</span>
-                            <button type="button" id="clear-images-btn" class="ml-2 text-blue-400 hover:underline">Change</button>
+                        <label for="proof-images" class="inline-block bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all text-sm cursor-pointer">
+                            + Add Image(s)
+                        </label>
+                        <input type="file" id="proof-images" name="proof-images" accept="image/*" multiple class="hidden">
+                        
+                        <div id="image-previews" class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                            <!-- Thumbnails will be injected here -->
                         </div>
-                        <p class="text-gray-500 text-xs mt-1">Leave blank if you don't want to change existing images while editing.</p>
-                        <p id="file-error" class="text-red-500 text-sm mt-1 hidden">Please select one or two files.</p>
+
+                        <p class="text-gray-500 text-xs mt-2">You can add multiple images (e.g., front and back of ID).</p>
+                        <p id="file-error" class="text-red-500 text-sm mt-1 hidden">Please add at least one identity proof image.</p>
                     </div>
                     
                     <!-- Buttons -->
@@ -263,6 +266,7 @@
         const fileError = document.getElementById('file-error');
         const beneficiaryListContainer = document.getElementById('beneficiary-list');
         const noDataMsg = document.getElementById('no-beneficiaries-msg');
+        const imagePreviewsContainer = document.getElementById('image-previews');
 
         // Cropping Modal elements
         const cropModal = document.getElementById('crop-modal');
@@ -270,8 +274,6 @@
         const cropModalTitle = document.getElementById('crop-modal-title');
         const confirmCropBtn = document.getElementById('confirm-crop-btn');
         const cancelCropBtn = document.getElementById('cancel-crop-btn');
-        const imageStatus = document.getElementById('image-status');
-        const clearImagesBtn = document.getElementById('clear-images-btn');
         
         const storageKey = 'beneficiariesData';
 
@@ -326,6 +328,19 @@
             }
         }
 
+        function renderFormThumbnails() {
+            imagePreviewsContainer.innerHTML = '';
+            croppedImagesData.forEach((imgSrc, index) => {
+                const thumbWrapper = document.createElement('div');
+                thumbWrapper.className = 'relative group';
+                thumbWrapper.innerHTML = `
+                    <img src="${imgSrc}" class="w-full h-24 object-cover rounded-md">
+                    <button type="button" data-index="${index}" class="remove-image-btn absolute top-1 right-1 bg-red-600 text-white rounded-full h-6 w-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">&times;</button>
+                `;
+                imagePreviewsContainer.appendChild(thumbWrapper);
+            });
+        }
+
         function populatePreview(data) {
             document.getElementById('preview-name').textContent = data.name;
             document.getElementById('preview-proof-type').textContent = data.proofType;
@@ -352,7 +367,7 @@
         function openCropModal() {
             if (filesToCrop.length === 0) return;
             currentCropIndex = 0;
-            croppedImagesData = [];
+            // The line that was incorrectly resetting the images array has been removed from here.
             cropModal.classList.remove('hidden');
             loadNextImageToCrop();
         }
@@ -389,8 +404,8 @@
                     cropper.destroy();
                     cropper = null;
                 }
-                imageStatus.classList.remove('hidden');
-                imageInput.disabled = true;
+                imageInput.value = ''; // Clear input for next selection
+                renderFormThumbnails();
             }
         }
 
@@ -400,17 +415,8 @@
                 cropper.destroy();
                 cropper = null;
             }
-            // Clear the file input and any partial data since it was a cancellation
+            // Clear the file input but don't clear already cropped data
             imageInput.value = '';
-            croppedImagesData = [];
-        }
-
-        function clearImageSelection() {
-            croppedImagesData = [];
-            imageInput.value = '';
-            imageInput.disabled = false;
-            imageStatus.classList.add('hidden');
-            fileError.classList.add('hidden');
         }
 
 
@@ -421,7 +427,8 @@
             document.getElementById('edit-id').value = '';
             document.getElementById('form-submit-btn').textContent = 'Save Document';
             imageInput.required = true;
-            clearImageSelection();
+            croppedImagesData = [];
+            renderFormThumbnails();
             renderBeneficiaryList();
             showInMain(formSection);
         }
@@ -438,7 +445,7 @@
         
         function handleEditAction(beneficiary) {
             activeBeneficiaryId = beneficiary.id;
-            clearImageSelection();
+            croppedImagesData = [...beneficiary.images];
             document.getElementById('edit-id').value = beneficiary.id;
             document.getElementById('name').value = beneficiary.name;
             document.getElementById('proof-type').value = beneficiary.proofType;
@@ -449,6 +456,7 @@
             document.getElementById('account-type').value = beneficiary.accountType;
             document.getElementById('form-submit-btn').textContent = 'Update Document';
             imageInput.required = false;
+            renderFormThumbnails();
             renderBeneficiaryList();
             showInMain(formSection);
         }
@@ -465,16 +473,17 @@
         // Crop Modal Listeners
         confirmCropBtn.addEventListener('click', handleConfirmCrop);
         cancelCropBtn.addEventListener('click', handleCancelCrop);
-        clearImagesBtn.addEventListener('click', clearImageSelection);
+
+        imagePreviewsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-image-btn')) {
+                const indexToRemove = parseInt(e.target.dataset.index, 10);
+                croppedImagesData.splice(indexToRemove, 1);
+                renderFormThumbnails();
+            }
+        });
         
         imageInput.addEventListener('change', () => {
             const files = Array.from(imageInput.files);
-            if (files.length > 2) {
-                fileError.textContent = 'You can upload a maximum of two files.';
-                fileError.classList.remove('hidden');
-                imageInput.value = '';
-                return;
-            }
             fileError.classList.add('hidden');
             if (files.length > 0) {
                 filesToCrop = files;
@@ -510,12 +519,12 @@
             }
         });
 
-        beneficiaryForm.addEventListener('submit', async function(e) {
+        beneficiaryForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const editId = document.getElementById('edit-id').value;
 
-            if (!editId && croppedImagesData.length === 0) {
-                 fileError.textContent = 'Please select and crop one or two files for a new entry.';
+            if (croppedImagesData.length === 0) {
+                 fileError.textContent = 'Please add at least one identity proof image.';
                  fileError.classList.remove('hidden');
                  return;
             }
@@ -523,7 +532,7 @@
 
             const beneficiaries = getBeneficiaries();
             let currentData;
-
+            
             if (editId) { // Editing existing
                 currentData = beneficiaries.find(b => b.id === editId);
                 currentData.name = document.getElementById('name').value;
@@ -533,9 +542,7 @@
                 currentData.branchCode = document.getElementById('branch-code').value;
                 currentData.accountNo = document.getElementById('account-no').value;
                 currentData.accountType = document.getElementById('account-type').value;
-                if (croppedImagesData.length > 0) {
-                     currentData.images = croppedImagesData;
-                }
+                currentData.images = croppedImagesData; // Always update with the current list
             } else { // Creating new
                 currentData = {
                     id: Date.now().toString(),
@@ -565,5 +572,4 @@
     </script>
 </body>
 </html>
-
 
