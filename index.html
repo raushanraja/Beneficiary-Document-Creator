@@ -47,6 +47,10 @@
 
         /* Print-specific styles */
         @media print {
+            body > .flex.h-screen {
+                height: auto !important;
+                display: block !important;
+            }
             body {
                 background-color: #ffffff !important;
                 -webkit-print-color-adjust: exact;
@@ -95,6 +99,8 @@
 
             /* Styles for printing the attestation page */
             .printing-attestation #sidebar-section,
+            .printing-attestation #welcome-section,
+            .printing-attestation #form-section,
             .printing-attestation #preview-section,
             .printing-attestation #standalone-attest-section {
                 display: none !important;
@@ -106,7 +112,13 @@
                 top: 0;
                 left: 0;
                 margin: 0;
-                padding: 15mm;
+                padding: 0; /* Reset padding */
+                background: transparent !important; /* Reset background */
+                border: none !important;
+                box-shadow: none !important;
+            }
+            .printing-attestation #attestation-images-container {
+                padding: 15mm !important; /* Apply margin to the printable area */
             }
         }
     </style>
@@ -771,4 +783,5 @@
     </script>
 </body>
 </html>
+
 
