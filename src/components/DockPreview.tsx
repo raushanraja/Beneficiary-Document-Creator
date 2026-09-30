@@ -83,6 +83,7 @@ export const DockPreview = () => {
           </Match>
 
           <Match when={app.view() === "idprint"}>
+            <Toggle label="Sheet title" value={idp.showTitle()} onFlip={() => idp.setShowTitle(!idp.showTitle())} />
             <Toggle label="Two per row" value={idp.twoUp()} onFlip={() => idp.setTwoUp(!idp.twoUp())} />
             <Toggle label="Cut guides" value={idp.guides()} onFlip={() => idp.setGuides(!idp.guides())} />
             <Toggle label="Captions" value={idp.caption()} onFlip={() => idp.setCaption(!idp.caption())} />
@@ -99,6 +100,7 @@ export const DockPreview = () => {
           </Match>
 
           <Match when={app.view() === "board"}>
+            <Toggle label="Sheet title" value={board.showTitle()} onFlip={() => board.setShowTitle(!board.showTitle())} />
             <Toggle label="Captions" value={board.captions()} onFlip={() => board.setCaptions(!board.captions())} />
             <p class="font-mono text-[11px] text-fg-dim">
               {board.images().length} images · {board.cols()} col

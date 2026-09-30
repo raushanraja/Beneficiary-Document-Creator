@@ -9,12 +9,13 @@ import { uid } from "~/lib/images";
 export const createIdPrintStore = () => {
   const [images, setImages] = createSignal<StudioImage[]>([]);
   const [title, setTitle] = createSignal("ID Card Print");
+  const [showTitle, setShowTitle] = createSignal(true);
   const [twoUp, setTwoUp] = createSignal(true);
   const [guides, setGuides] = createSignal(true);
   const [caption, setCaption] = createSignal(true);
 
   return {
-    images, title, setTitle, twoUp, setTwoUp, guides, setGuides, caption, setCaption,
+    images, title, setTitle, showTitle, setShowTitle, twoUp, setTwoUp, guides, setGuides, caption, setCaption,
     add: (src: string, label?: string) =>
       setImages((p) => [...p, { id: uid(), src, label: label ?? `card-${p.length + 1}` }]),
     remove: (id: string) => setImages((p) => p.filter((i) => i.id !== id)),

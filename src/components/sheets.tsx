@@ -11,7 +11,7 @@ const sheetCls = "a4-sheet p-[10mm] text-[12px] leading-6 text-black";
 
 export const BeneficiarySheet = (p: { b: Beneficiary }) => (
   <div class={sheetCls}>
-    <h1 class="border-b-2 border-black pb-2 text-xl font-semibold">Beneficiary Details</h1>
+    <h1 class="pb-2 text-xl font-semibold">Beneficiary Details</h1>
     <h2 class="mb-2 mt-5 border-b border-gray-300 pb-1 text-base font-semibold">
       Personal Information
     </h2>
@@ -78,13 +78,16 @@ export const AttestationSheet = (p: { images: StudioImage[]; watermark: boolean 
 
 export const IdSheet = (p: {
   title: string;
+  showTitle: boolean;
   images: StudioImage[];
   twoUp: boolean;
   guides: boolean;
   caption: boolean;
 }) => (
   <div class={sheetCls}>
-    <h1 class="mb-4 border-b-2 border-black pb-2 text-lg font-semibold">{p.title}</h1>
+    <Show when={p.showTitle}>
+      <h1 class="mb-4 pb-2 text-lg font-semibold">{p.title}</h1>
+    </Show>
     <div
       class="grid gap-4"
       style={{ "grid-template-columns": p.twoUp ? "1fr 1fr" : "1fr" }}
@@ -131,21 +134,21 @@ export const PhotoSheet = (p: { src: string; size: PhotoSize; count: number; gap
           )}
         </For>
       </div>
-      <p class="mt-4 text-[11px] text-gray-600">
-        {p.count} × {p.size.label} — cut along the borders.
-      </p>
     </div>
   );
 };
 
 export const BoardSheet = (p: {
   title: string;
+  showTitle: boolean;
   images: StudioImage[];
   cols: number;
   captions: boolean;
 }) => (
   <div class={sheetCls}>
-    <h1 class="mb-4 border-b-2 border-black pb-2 text-lg font-semibold">{p.title}</h1>
+    <Show when={p.showTitle}>
+      <h1 class="mb-4 pb-2 text-lg font-semibold">{p.title}</h1>
+    </Show>
     <div class="grid gap-3" style={{ "grid-template-columns": `repeat(${p.cols}, 1fr)` }}>
       <For each={p.images}>
         {(img) => (

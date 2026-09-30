@@ -98,6 +98,7 @@ export const IdPrintStudio = () => {
             <div style={{ zoom: 0.5 }}>
               <IdSheet
                 title={idp.title()}
+                showTitle={idp.showTitle()}
                 images={idp.images()}
                 twoUp={idp.twoUp()}
                 guides={idp.guides()}

@@ -26,6 +26,7 @@ export const PrintRoot = () => {
         <Match when={app.view() === "idprint" && idp.images().length > 0}>
           <IdSheet
             title={idp.title()}
+            showTitle={idp.showTitle()}
             images={idp.images()}
             twoUp={idp.twoUp()}
             guides={idp.guides()}
@@ -38,6 +39,7 @@ export const PrintRoot = () => {
         <Match when={app.view() === "board" && board.images().length > 0}>
           <BoardSheet
             title={board.title()}
+            showTitle={board.showTitle()}
             images={board.images()}
             cols={board.cols()}
             captions={board.captions()}

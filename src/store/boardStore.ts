@@ -6,11 +6,12 @@ import { uid } from "~/lib/images";
 export const createBoardStore = () => {
   const [images, setImages] = createSignal<StudioImage[]>([]);
   const [title, setTitle] = createSignal("Document Board");
+  const [showTitle, setShowTitle] = createSignal(true);
   const [cols, setCols] = createSignal(2);
   const [captions, setCaptions] = createSignal(true);
 
   return {
-    images, title, setTitle, cols, setCols, captions, setCaptions,
+    images, title, setTitle, showTitle, setShowTitle, cols, setCols, captions, setCaptions,
     add: (src: string, label?: string) =>
       setImages((p) => [...p, { id: uid(), src, label: label ?? `img-${p.length + 1}` }]),
     remove: (id: string) => setImages((p) => p.filter((i) => i.id !== id)),

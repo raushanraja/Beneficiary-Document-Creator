@@ -103,6 +103,7 @@ export const BoardStudio = () => {
             <div style={{ zoom: 0.5 }}>
               <BoardSheet
                 title={board.title()}
+                showTitle={board.showTitle()}
                 images={board.images()}
                 cols={board.cols()}
                 captions={board.captions()}
