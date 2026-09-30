@@ -1,6 +1,5 @@
-import { Show } from "solid-js";
-import { Moon, PanelLeft, PanelRight, Printer, Settings, Sun } from "lucide-solid";
-import { useApp, useTheme } from "~/store/context";
+import { PanelLeft, PanelRight, Printer, Settings } from "lucide-solid";
+import { useApp } from "~/store/context";
 import { IconButton } from "./IconButton";
 import { ThemeMenu } from "./ThemeMenu";
 import type { View } from "~/types";
@@ -19,7 +18,6 @@ const TITLES: Record<View, string> = {
 
 export const Header = () => {
   const app = useApp();
-  const theme = useTheme();
 
   return (
     <header class="flex h-10 shrink-0 items-center gap-3 border-b border-edge bg-header px-3">
@@ -55,14 +53,6 @@ export const Header = () => {
           onClick={() => app.setDockOpen(!app.dockOpen())}
         >
           <PanelRight class="icon" />
-        </IconButton>
-        <IconButton
-          label="Toggle theme mode"
-          onClick={theme.toggle}
-        >
-          <Show when={theme.mode() === "dark"} fallback={<Sun class="icon" />}>
-            <Moon class="icon" />
-          </Show>
         </IconButton>
         <ThemeMenu />
         <IconButton label="Settings" onClick={() => app.openModal("settings")}>

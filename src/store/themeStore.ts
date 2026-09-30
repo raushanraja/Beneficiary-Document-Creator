@@ -9,7 +9,7 @@ export type Mode = "dark" | "light";
 
 const STORE_KEY = "printstudio.theme";
 const MODE_KEY = "printstudio.mode";
-const DEFAULT_NAME = "midnight";
+const DEFAULT_NAME = "paper";
 
 const read = (key: string, fallback: string): string => {
   try {
@@ -34,7 +34,7 @@ const apply = (name: string, mode: Mode) => {
 export const createThemeStore = () => {
   const [name, setName] = createSignal(read(STORE_KEY, DEFAULT_NAME));
   const [mode, setMode] = createSignal<Mode>(
-    read(MODE_KEY, "dark") === "light" ? "light" : "dark",
+    read(MODE_KEY, "light") === "dark" ? "dark" : "light",
   );
 
   createEffect(() => apply(name(), mode()));

@@ -1,4 +1,4 @@
-import { createSignal, onMount } from "solid-js";
+import { createEffect, createSignal, onMount } from "solid-js";
 import { Check, X } from "lucide-solid";
 import { useApp, useAttest, useBeneficiaries, useBoard, useIdPrint, usePhoto } from "~/store/context";
 import { cropDataUrl, loadImage } from "~/lib/images";
@@ -24,7 +24,10 @@ export const CropModal = () => {
   // selection in display px
   const [rect, setRect] = createSignal({ x: 40, y: 40, w: 240, h: 160 });
   const [busy, setBusy] = createSignal(false);
+  const [loading, setLoading] = createSignal(true);
+  const [loadedSrc, setLoadedSrc] = createSignal<string | null>(null);
   const [err, setErr] = createSignal<string | null>(null);
+  let loadToken = 0;
   let mode: "none" | "draw" | "move" | "resize" = "none";
   let grabDX = 0;
   let grabDY = 0;
@@ -115,24 +118,48 @@ export const CropModal = () => {
 
   const onUp = () => { mode = "none"; };
 
-  onMount(async () => {
+  const loadJob = async (src: string) => {
+    const t = ++loadToken;
+    setLoading(true);
+    setErr(null);
     try {
-      img = await loadImage(job()!.src);
+      const next = await loadImage(src);
+      if (t !== loadToken) return; // superseded by a newer job
+      img = next;
       const { dw, dh } = fit();
       const a = job()?.aspect;
       let w = dw * 0.8;
       let h = a ? w / a : dh * 0.6;
       if (h > dh * 0.9) { h = dh * 0.9; w = a ? h * a : w; }
       setRect({ x: (dw - w) / 2, y: (dh - h) / 2, w, h });
+      setLoadedSrc(src);
       draw();
     } catch {
+      if (t !== loadToken) return;
       setErr("Could not decode that image.");
+    } finally {
+      if (t === loadToken) {
+        setLoading(false);
+        setBusy(false);
+      }
     }
+  };
+
+  onMount(() => {
+    const j = job();
+    if (j) void loadJob(j.src);
+  });
+
+  // The queue advances inside this same mounted modal — a new job must load
+  // its own image and release the Working state, not reuse the previous one.
+  createEffect(() => {
+    const j = job();
+    if (j && canvasRef && j.src !== loadedSrc()) void loadJob(j.src);
   });
 
   const confirm = async () => {
     const j = job();
-    if (!j || !img || busy()) return;
+    if (!j || !img || busy() || loading()) return;
     setBusy(true);
     try {
       const c = canvasRef!;
@@ -189,10 +216,10 @@ export const CropModal = () => {
         <button
           type="button"
           class="chip border-accent/40 text-accent"
-          disabled={busy()}
+          disabled={busy() || loading()}
           onClick={confirm}
         >
-          <Check class="icon icon--accent" /> {busy() ? "Working…" : "Confirm crop"}
+          <Check class="icon icon--accent" /> {loading() ? "Loading…" : busy() ? "Working…" : "Confirm crop"}
         </button>
       </div>
     </div>
