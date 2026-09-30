@@ -1,0 +1,27 @@
+{
+  "name": "print-studio",
+  "version": "1.0.0",
+  "description": "Full-fledged A4 print studio: beneficiary documents, self-attestation, ID print, photo grid, image board.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.13",
+    "@types/node": "^26.6.3",
+    "solid-devtools": "^0.34.3",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.4",
+    "vite-plugin-solid": "^2.11.8"
+  },
+  "dependencies": {
+    "lucide-solid": "^1.48.0",
+    "solid-js": "^1.9.9"
+  }
+}
