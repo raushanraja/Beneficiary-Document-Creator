@@ -100,7 +100,7 @@ export const BoardStudio = () => {
             <input
               type="number"
               min={0}
-              max={10}
+              max={20}
               step={0.5}
               value={board.gapMm()}
               onInput={(e) => board.setGap(Number(e.currentTarget.value) || 0)}

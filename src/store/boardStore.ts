@@ -13,7 +13,7 @@ export const createBoardStore = () => {
 
   return {
     images, title, setTitle, showTitle, setShowTitle, cols, setCols,
-    gapMm, setGap: (v: number) => setGapMm(Math.max(0, Math.min(10, v))),
+    gapMm, setGap: (v: number) => setGapMm(Math.max(0, Math.min(20, v))),
     captions, setCaptions,
     add: (src: string, label?: string) =>
       setImages((p) => [...p, { id: uid(), src, label: label ?? `img-${p.length + 1}` }]),
