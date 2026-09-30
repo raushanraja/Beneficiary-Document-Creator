@@ -42,6 +42,7 @@ export const PrintRoot = () => {
             showTitle={board.showTitle()}
             images={board.images()}
             cols={board.cols()}
+            gapMm={board.gapMm()}
             captions={board.captions()}
           />
         </Match>

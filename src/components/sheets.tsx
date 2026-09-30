@@ -143,13 +143,14 @@ export const BoardSheet = (p: {
   showTitle: boolean;
   images: StudioImage[];
   cols: number;
+  gapMm: number;
   captions: boolean;
 }) => (
   <div class={sheetCls}>
     <Show when={p.showTitle}>
       <h1 class="mb-4 pb-2 text-lg font-semibold">{p.title}</h1>
     </Show>
-    <div class="grid gap-3" style={{ "grid-template-columns": `repeat(${p.cols}, 1fr)` }}>
+    <div class="grid" style={{ "grid-template-columns": `repeat(${p.cols}, 1fr)`, gap: `${p.gapMm}mm` }}>
       <For each={p.images}>
         {(img) => (
           <figure class="border border-gray-200 p-1" style={{ "break-inside": "avoid" }}>

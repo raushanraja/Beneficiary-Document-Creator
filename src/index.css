@@ -140,9 +140,9 @@
   .chip:hover:not(:disabled) { @apply border-edge-focus text-fg; }
   .chip:disabled { @apply pointer-events-none opacity-40; }
 
-  /* 11-15px, muted unless status-coloured. flex-shrink stops collapse. */
+  /* 13px, bolder stroke, muted unless status-coloured. flex-shrink stops collapse. */
   .icon {
-    width: 12px; height: 12px; stroke-width: 1.75;
+    width: 13px; height: 13px; stroke-width: 2.25;
     color: var(--color-fg-dim); flex-shrink: 0;
   }
   .icon--accent  { color: var(--color-accent); }

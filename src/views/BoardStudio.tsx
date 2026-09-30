@@ -95,6 +95,18 @@ export const BoardStudio = () => {
               class="w-14 rounded-chip border border-edge-subtle bg-input px-2 py-1 text-sm text-fg outline-none focus:border-edge-focus"
             />
           </label>
+          <label class="flex items-center gap-1.5 text-sm text-fg-muted">
+            <span class="font-mono text-[11px] uppercase">Gap (mm)</span>
+            <input
+              type="number"
+              min={0}
+              max={10}
+              step={0.5}
+              value={board.gapMm()}
+              onInput={(e) => board.setGap(Number(e.currentTarget.value) || 0)}
+              class="w-16 rounded-chip border border-edge-subtle bg-input px-2 py-1 text-sm text-fg outline-none focus:border-edge-focus"
+            />
+          </label>
         </div>
         <Show when={board.images().length > 0} fallback={
           <p class="text-sm text-fg-dim">Add images to preview the A4 sheet.</p>
@@ -106,6 +118,7 @@ export const BoardStudio = () => {
                 showTitle={board.showTitle()}
                 images={board.images()}
                 cols={board.cols()}
+                gapMm={board.gapMm()}
                 captions={board.captions()}
               />
             </div>

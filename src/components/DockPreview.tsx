@@ -103,7 +103,7 @@ export const DockPreview = () => {
             <Toggle label="Sheet title" value={board.showTitle()} onFlip={() => board.setShowTitle(!board.showTitle())} />
             <Toggle label="Captions" value={board.captions()} onFlip={() => board.setCaptions(!board.captions())} />
             <p class="font-mono text-[11px] text-fg-dim">
-              {board.images().length} images · {board.cols()} col
+              {board.images().length} images · {board.cols()} col · {board.gapMm()}mm gap
             </p>
             <PrintBtn disabled={board.images().length === 0} />
           </Match>
