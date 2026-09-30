@@ -78,9 +78,10 @@ export default function App() {
       window.print();
       return;
     }
-    if (e.altKey && ["1", "2", "3", "4", "5"].includes(e.key)) {
+    if (e.altKey && ["0", "1", "2", "3", "4", "5"].includes(e.key)) {
       e.preventDefault();
-      app.go(VIEWS[Number(e.key) - 1]!);
+      if (e.key === "0") app.go("welcome");
+      else app.go(VIEWS[Number(e.key) - 1]!);
       return;
     }
     if (e.key === "/" && !typing) {

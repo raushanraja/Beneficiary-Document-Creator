@@ -6,10 +6,11 @@ import { uid } from "~/lib/images";
 export const createAttestStore = () => {
   const [images, setImages] = createSignal<StudioImage[]>([]);
   const [watermark, setWatermark] = createSignal(true);
+  const [watermarkText, setWatermarkText] = createSignal("Self-Attested");
   const [from, setFrom] = createSignal<"standalone" | "beneficiary">("standalone");
 
   return {
-    images, watermark, setWatermark, from, setFrom,
+    images, watermark, setWatermark, watermarkText, setWatermarkText, from, setFrom,
     add: (src: string, label = "scan") =>
       setImages((p) => [...p, { id: uid(), src, label }]),
     remove: (id: string) => setImages((p) => p.filter((i) => i.id !== id)),

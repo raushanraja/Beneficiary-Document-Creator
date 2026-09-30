@@ -52,7 +52,7 @@ const BINDINGS: [string, string][] = [
   ["Ctrl+Shift+F", "Toggle preview dock"],
   ["Ctrl+N", "New beneficiary file"],
   ["Ctrl+P", "Print current sheet"],
-  ["Alt+1…5", "Switch studio"],
+  ["Alt+0…5", "Switch studio · Home"],
   ["/", "Focus beneficiary filter"],
   ["?", "This shortcut list"],
   ["Esc", "Close dialog · back one level"],

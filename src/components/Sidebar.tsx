@@ -2,6 +2,7 @@ import { For, Show, createSignal } from "solid-js";
 import {
   BadgeCheck,
   CreditCard,
+  House,
   Images,
   LayoutGrid,
   Plus,
@@ -14,6 +15,7 @@ import { IconButton } from "./IconButton";
 import type { View } from "~/types";
 
 const NAV: { view: View; label: string; shortcut: string }[] = [
+  { view: "welcome", label: "Home", shortcut: "Alt+0" },
   { view: "beneficiaries", label: "Beneficiaries", shortcut: "Alt+1" },
   { view: "attest", label: "Self-Attest", shortcut: "Alt+2" },
   { view: "idprint", label: "ID Print", shortcut: "Alt+3" },
@@ -24,6 +26,7 @@ const NAV: { view: View; label: string; shortcut: string }[] = [
 export const NavIcon = (p: { view: View }) => {
   const cls = "icon";
   switch (p.view) {
+    case "welcome": return <House class={cls} />;
     case "beneficiaries": return <Users class={cls} />;
     case "attest": return <BadgeCheck class={cls} />;
     case "idprint": return <CreditCard class={cls} />;

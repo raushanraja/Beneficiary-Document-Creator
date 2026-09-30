@@ -53,7 +53,6 @@ export const StatusBar = () => {
             Preview
           </button>
         </Show>
-        <span class="hidden sm:inline">UTF-8</span>
         <span class="hidden sm:inline">{theme.name()}</span>
         <span class="flex items-center gap-1.5">
           <span class="size-1.5 rounded-full bg-success" aria-hidden="true" />

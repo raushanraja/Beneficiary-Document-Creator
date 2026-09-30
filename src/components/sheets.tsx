@@ -53,7 +53,7 @@ const Row = (p: { k: string; v: string }) => (
   </tr>
 );
 
-export const AttestationSheet = (p: { images: StudioImage[]; watermark: boolean }) => (
+export const AttestationSheet = (p: { images: StudioImage[]; watermark: boolean; watermarkText: string }) => (
   <div class={sheetCls}>
     <For each={p.images}>
       {(img) => (
@@ -62,12 +62,12 @@ export const AttestationSheet = (p: { images: StudioImage[]; watermark: boolean 
           style={{ "break-inside": "avoid" }}
         >
           <img src={img.src} alt={img.label} class="h-auto w-full" />
-          <Show when={p.watermark}>
+          <Show when={p.watermark && p.watermarkText.trim() !== ""}>
             <div
               class="print-watermark pointer-events-none absolute inset-0 flex items-center justify-center text-5xl font-bold"
               style={{ transform: "rotate(-30deg)" }}
             >
-              Self-Attested
+              {p.watermarkText}
             </div>
           </Show>
         </div>

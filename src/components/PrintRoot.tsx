@@ -21,7 +21,7 @@ export const PrintRoot = () => {
           <BeneficiarySheet b={ben.byId(app.activeBeneficiaryId())!} />
         </Match>
         <Match when={(app.view() === "attest" || app.view() === "attestation") && attest.images().length > 0}>
-          <AttestationSheet images={attest.images()} watermark={attest.watermark()} />
+          <AttestationSheet images={attest.images()} watermark={attest.watermark()} watermarkText={attest.watermarkText()} />
         </Match>
         <Match when={app.view() === "idprint" && idp.images().length > 0}>
           <IdSheet

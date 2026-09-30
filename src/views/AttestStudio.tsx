@@ -72,7 +72,7 @@ export const AttestStudio = () => {
         }>
           <div class="overflow-x-auto rounded border border-edge-subtle bg-deep p-2">
             <div style={{ zoom: 0.5 }}>
-              <AttestationSheet images={attest.images()} watermark={attest.watermark()} />
+              <AttestationSheet images={attest.images()} watermark={attest.watermark()} watermarkText={attest.watermarkText()} />
             </div>
           </div>
           <button
@@ -123,7 +123,7 @@ export const AttestationView = () => {
       }>
         <div class="overflow-x-auto rounded border border-edge bg-deep p-2">
           <div style={{ zoom: 0.62 }}>
-            <AttestationSheet images={attest.images()} watermark={attest.watermark()} />
+            <AttestationSheet images={attest.images()} watermark={attest.watermark()} watermarkText={attest.watermarkText()} />
           </div>
         </div>
       </Show>

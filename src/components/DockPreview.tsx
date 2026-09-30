@@ -68,7 +68,22 @@ export const DockPreview = () => {
           </Match>
 
           <Match when={app.view() === "attest" || app.view() === "attestation"}>
-            <Toggle label="Self-Attested watermark" value={attest.watermark()} onFlip={() => attest.setWatermark(!attest.watermark())} />
+            <Toggle label="Self-attested watermark" value={attest.watermark()} onFlip={() => attest.setWatermark(!attest.watermark())} />
+            <Show when={attest.watermark()}>
+              <label class="block">
+                <span class="mb-1 block font-mono text-[10px] uppercase tracking-[0.05em] text-fg-dim">
+                  Watermark text
+                </span>
+                <input
+                  type="text"
+                  value={attest.watermarkText()}
+                  onInput={(e) => attest.setWatermarkText(e.currentTarget.value)}
+                  placeholder="Self-Attested"
+                  aria-label="Watermark text"
+                  class="w-full rounded-chip border border-edge-subtle bg-input px-2 py-1 text-sm text-fg outline-none placeholder:text-fg-dim focus:border-edge-focus"
+                />
+              </label>
+            </Show>
             <p class="font-mono text-[11px] text-fg-dim">{attest.images().length} scans on A4</p>
             <PrintBtn disabled={attest.images().length === 0} />
             <Show when={app.view() === "attest" && attest.images().length > 0}>
