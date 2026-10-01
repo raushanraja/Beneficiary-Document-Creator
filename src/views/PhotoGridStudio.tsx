@@ -71,7 +71,7 @@ export const PhotoGridStudio = () => {
           fallback={<p class="text-sm text-fg-dim">Add a portrait to preview the A4 sheet.</p>}
         >
           {(src) => (
-            <div style={{ zoom: 0.5 }}>
+            <div class="sheet-zoom">
               <PhotoSheet src={src()} size={photo.size()} count={photo.count()} gap={photo.gap()} />
             </div>
           )}

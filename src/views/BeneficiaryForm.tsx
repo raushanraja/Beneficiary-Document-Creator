@@ -170,7 +170,7 @@ export const BeneficiaryForm = () => {
             Identity proof scans · {ben.stageImages().length}
           </h2>
           <p class="mb-3 font-mono text-[11px] text-fg-dim">
-            Each upload opens the cropper (3:2 locked) · hover a scan to redact or remove
+            Each upload opens the cropper (3:2 locked) · every scan has redact / remove buttons
           </p>
           <input
             ref={fileRef}

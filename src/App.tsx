@@ -86,7 +86,10 @@ export default function App() {
     }
     if (e.key === "/" && !typing) {
       e.preventDefault();
-      document.querySelector<HTMLElement>('aside input[type="search"]')?.focus();
+      if (app.mobile()) app.setSidebarOpen(true);
+      requestAnimationFrame(() =>
+        document.querySelector<HTMLElement>('aside input[type="search"]')?.focus(),
+      );
       return;
     }
     if (e.key === "?" && !typing) {
@@ -95,6 +98,8 @@ export default function App() {
     }
     if (e.key === "Escape") {
       if (app.modal()) app.closeModal();
+      else if (app.mobile() && app.sidebarOpen()) app.setSidebarOpen(false);
+      else if (app.compact() && app.dockOpen()) app.setDockOpen(false);
       else if (app.view() === "attestation") {
         app.go(attest.from() === "beneficiary" ? "beneficiary-detail" : "attest");
       } else if (app.view() === "beneficiary-detail") app.go("beneficiaries");
@@ -117,7 +122,7 @@ export default function App() {
                     <div class="relative mx-auto flex h-full max-w-[1400px] flex-col border border-edge bg-shell md:rounded-card">
                       <Header />
                       <div class="flex min-h-0 flex-1">
-                        <Show when={!app.zen()}>
+                        <Show when={!app.zen() && (!app.mobile() || app.sidebarOpen())}>
                           <Sidebar />
                         </Show>
                         <main class="min-w-0 flex-1 overflow-y-auto bg-chat" aria-label="Studio">
@@ -137,7 +142,7 @@ export default function App() {
                           aria-label="Open print settings"
                           title="Print settings"
                           onClick={() => app.setDockOpen(true)}
-                          class="absolute bottom-10 right-3 chip border-accent/40 text-accent md:hidden"
+                          class="absolute bottom-10 right-3 chip border-accent/40 text-accent lg:hidden"
                         >
                           <PanelRight class="icon icon--accent" /> Print
                         </button>

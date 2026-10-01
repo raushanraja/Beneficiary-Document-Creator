@@ -15,7 +15,7 @@ export const Thumb = (p: {
 }) => (
   <div class="group relative rounded border border-edge bg-deep">
     <img src={p.src} alt={p.label ?? "staged scan"} class="h-24 w-full rounded object-cover" />
-    <div class="absolute inset-0 flex items-center justify-center gap-1 rounded bg-black/55 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+    <div class="thumb-actions absolute inset-0 flex flex-wrap items-center justify-center gap-1 rounded bg-black/55 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
       <Show when={p.onLeft}>
         <button
           type="button"

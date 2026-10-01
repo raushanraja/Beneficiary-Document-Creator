@@ -98,10 +98,10 @@ export const RedactModal = () => {
       {err() ? (
         <p class="mb-3 rounded border border-error/40 bg-error-subtle px-2 py-1 text-sm text-error">{err()}</p>
       ) : null}
-      <div class="flex max-h-[55vh] justify-center overflow-auto rounded border border-edge bg-deep p-1">
+      <div class="flex max-h-[55dvh] justify-center overflow-auto rounded border border-edge bg-deep p-1">
         <canvas
           ref={canvasRef}
-          class="max-h-[52vh] max-w-full cursor-crosshair touch-none"
+          class="max-h-[52dvh] max-w-full cursor-crosshair touch-none"
           onMouseDown={down}
           onMouseMove={move}
           onMouseUp={up}

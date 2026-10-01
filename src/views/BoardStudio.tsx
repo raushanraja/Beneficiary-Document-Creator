@@ -114,7 +114,7 @@ export const BoardStudio = () => {
           when={board.images().length > 0}
           fallback={<p class="text-sm text-fg-dim">Add images to preview the A4 sheet.</p>}
         >
-          <div style={{ zoom: 0.5 }}>
+          <div class="sheet-zoom">
             <BoardSheet
               title={board.title()}
               showTitle={board.showTitle()}

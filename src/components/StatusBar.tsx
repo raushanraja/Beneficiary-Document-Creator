@@ -49,7 +49,7 @@ export const StatusBar = () => {
           ? Keys
         </button>
         <Show when={!app.dockOpen()}>
-          <button type="button" class="chip md:hidden" onClick={() => app.setDockOpen(true)}>
+          <button type="button" class="chip lg:hidden" onClick={() => app.setDockOpen(true)}>
             Preview
           </button>
         </Show>

@@ -67,7 +67,7 @@ export const AttestStudio = () => {
           when={attest.images().length > 0}
           fallback={<p class="text-sm text-fg-dim">Add at least one scan to preview the sheet.</p>}
         >
-          <div style={{ zoom: 0.5 }}>
+          <div class="sheet-zoom">
             <AttestationSheet images={attest.images()} watermark={attest.watermark()} watermarkText={attest.watermarkText()} />
           </div>
         </Show>
@@ -106,7 +106,7 @@ export const AttestationView = () => {
             </div>
           }
         >
-          <div style={{ zoom: 0.62 }}>
+          <div class="sheet-zoom-lg">
             <AttestationSheet images={attest.images()} watermark={attest.watermark()} watermarkText={attest.watermarkText()} />
           </div>
         </Show>

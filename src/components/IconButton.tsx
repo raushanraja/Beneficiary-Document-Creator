@@ -6,6 +6,7 @@ export const IconButton = (p: {
   shortcut?: string;
   onClick: () => void;
   disabled?: boolean;
+  class?: string;
   children: JSX.Element;
 }) => (
   <button
@@ -14,7 +15,7 @@ export const IconButton = (p: {
     title={p.shortcut ? `${p.label} · ${p.shortcut}` : p.label}
     disabled={p.disabled}
     onClick={p.onClick}
-    class="chip p-1 disabled:pointer-events-none disabled:opacity-40"
+    class={`chip p-1 disabled:pointer-events-none disabled:opacity-40 ${p.class ?? ""}`}
   >
     {p.children}
   </button>

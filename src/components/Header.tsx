@@ -27,7 +27,7 @@ export const Header = () => {
           <PanelLeft class="icon" />
         </IconButton>
         <span class="size-2 rounded-full bg-success" aria-hidden="true" />
-        <span class="font-mono text-xs uppercase tracking-widest text-fg">PrintStudio</span>
+        <span class="hidden font-mono text-xs uppercase tracking-widest text-fg md:inline">PrintStudio</span>
         <span class="hidden font-mono text-[10px] text-fg-dim lg:inline">v1.0</span>
         <span class="hidden font-mono text-[10px] uppercase tracking-widest text-fg-dim sm:inline">
           Local
@@ -50,6 +50,7 @@ export const Header = () => {
         <IconButton
           label="Toggle print settings dock"
           shortcut="Ctrl+Shift+F"
+          class="max-md:hidden"
           onClick={() => app.setDockOpen(!app.dockOpen())}
         >
           <PanelRight class="icon" />

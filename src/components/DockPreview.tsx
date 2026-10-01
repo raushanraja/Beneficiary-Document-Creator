@@ -28,7 +28,7 @@ const PrintBtn = (p: { disabled?: boolean }) => (
 
 /**
  * Right dock: print settings + sheet summary for the active view.
- * Collapses behind a toggle below 900px (see App shell).
+ * Below lg it becomes a right-hand overlay drawer; on desktop it stays docked.
  */
 export const DockPreview = () => {
   const app = useApp();
@@ -41,19 +41,27 @@ export const DockPreview = () => {
   const b = () => ben.byId(app.activeBeneficiaryId());
 
   return (
-    <aside
-      aria-label="Print preview and settings"
-      class="w-80 shrink-0 flex-col border-l border-edge bg-sidebar"
-      classList={{ flex: app.dockOpen(), hidden: !app.dockOpen() }}
-    >
-      <div class="flex items-center gap-2 border-b border-edge-subtle px-3 py-2">
-        <p class="font-mono text-[10px] uppercase tracking-[0.05em] text-fg-dim">Print settings</p>
-        <span class="ml-auto md:hidden">
-          <IconButton label="Close preview" onClick={() => app.setDockOpen(false)}>
-            <X class="icon" />
-          </IconButton>
-        </span>
-      </div>
+    <>
+      <Show when={app.compact() && app.dockOpen()}>
+        <div
+          class="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm"
+          aria-hidden="true"
+          onClick={() => app.setDockOpen(false)}
+        />
+      </Show>
+      <aside
+        aria-label="Print preview and settings"
+        class="w-80 shrink-0 flex-col border-l border-edge bg-sidebar max-lg:fixed max-lg:inset-y-0 max-lg:right-0 max-lg:z-40 max-lg:max-w-[85vw] max-lg:shadow-2xl"
+        classList={{ flex: app.dockOpen(), hidden: !app.dockOpen() }}
+      >
+        <div class="flex items-center gap-2 border-b border-edge-subtle px-3 py-2">
+          <p class="font-mono text-[10px] uppercase tracking-[0.05em] text-fg-dim">Print settings</p>
+          <span class="ml-auto lg:hidden">
+            <IconButton label="Close preview" onClick={() => app.setDockOpen(false)}>
+              <X class="icon" />
+            </IconButton>
+          </span>
+        </div>
 
       <div class="min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
         <Switch fallback={
@@ -151,6 +159,7 @@ export const DockPreview = () => {
       <div class="border-t border-edge px-3 py-2 font-mono text-[10px] uppercase tracking-[0.05em] text-fg-dim">
         A4 · 10mm margins
       </div>
-    </aside>
+      </aside>
+    </>
   );
 };

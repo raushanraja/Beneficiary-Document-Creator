@@ -22,7 +22,7 @@ export const ModalHost = () => {
           role="dialog"
           aria-modal="true"
           aria-label="Dialog"
-          class="max-h-[88vh] w-[min(760px,94vw)] overflow-y-auto rounded-card border border-edge bg-elevated p-4"
+          class="max-h-[88dvh] w-[min(760px,94vw)] overflow-y-auto rounded-card border border-edge bg-elevated p-4"
         >
           <Switch fallback={null}>
             <Match when={app.modal() === "crop" && app.cropJob()}>

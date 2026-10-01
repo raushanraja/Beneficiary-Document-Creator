@@ -13,7 +13,7 @@ export const StudioLayout = (p: {
   preview: JSX.Element;
   actions?: JSX.Element;
 }) => (
-  <div class="mx-auto flex h-full min-h-0 max-w-4xl flex-col px-4 py-4">
+  <div class="mx-auto flex h-full min-h-0 max-w-4xl flex-col px-3 py-3 md:px-4 md:py-4">
     <div class="shrink-0">
       <h1 class="font-mono text-xs uppercase tracking-[0.05em] text-fg">{p.title}</h1>
       <Show when={p.desc}>

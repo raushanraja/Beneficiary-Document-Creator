@@ -151,6 +151,47 @@
   .icon--error   { color: var(--color-error); }
 }
 
+/* ── small screens + touch ─────────────────────────────────────────────────
+ *
+ * Below md the shell is full-bleed and the overlays are drawers, so:
+ * - 16px form fields stop iOS Safari from zooming the page on focus;
+ * - coarse pointers get taller tap targets and always-visible thumb actions
+ *   (hover cannot reveal them on touch);
+ * - A4 previews fit the viewport instead of forcing horizontal scroll.
+ */
+
+@media (max-width: 767.98px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+@media (pointer: coarse) {
+  .chip {
+    min-height: 2rem;
+    padding-inline: 0.625rem;
+    touch-action: manipulation;
+  }
+  .chip kbd { display: none; }
+  footer .chip { min-height: 1.5rem; }
+  .thumb-actions { opacity: 1; }
+}
+
+.sheet-zoom { zoom: 0.5; }
+.sheet-zoom-lg { zoom: 0.62; }
+
+@media (max-width: 480px) {
+  .sheet-zoom,
+  .sheet-zoom-lg { zoom: 0.42; }
+}
+
+@media (max-width: 380px) {
+  .sheet-zoom,
+  .sheet-zoom-lg { zoom: 0.34; }
+}
+
 /* ── runtime theme matrix ──────────────────────────────────────────────────
  *
  * 11 dark + 7 light themes, generated and validated.

@@ -99,7 +99,7 @@ export const IdPrintStudio = () => {
           when={idp.images().length > 0}
           fallback={<p class="text-sm text-fg-dim">Add cards to preview the A4 sheet.</p>}
         >
-          <div style={{ zoom: 0.5 }}>
+          <div class="sheet-zoom">
             <IdSheet
               title={idp.title()}
               showTitle={idp.showTitle()}

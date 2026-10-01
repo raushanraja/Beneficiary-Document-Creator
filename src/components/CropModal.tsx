@@ -341,7 +341,7 @@ export const CropModal = () => {
       {err() ? (
         <p class="mb-3 rounded border border-error/40 bg-error-subtle px-2 py-1 text-sm text-error">{err()}</p>
       ) : null}
-      <div class="flex max-h-[60vh] justify-center overflow-auto rounded border border-edge bg-deep p-1">
+      <div class="flex max-h-[60dvh] justify-center overflow-auto rounded border border-edge bg-deep p-1">
         <canvas
           ref={canvasRef}
           tabindex={0}
